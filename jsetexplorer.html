@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HTML 5 Mandelbrot set and Julia set explorer</title>
+    <script type="application/x-javascript" src="fractal.js"></script>
+    <style>
+      h1 {
+      font-size:1.2em;
+      }
+      
+      h2 {
+      font-size:1.0em;
+      }
+      
+      p {
+      font-size:0.8em;
+      }
+      
+      address {
+      font-size:0.6em;
+      }
+    </style>
+  </head>
+  <body onload="mandelbrot()" onkeypress=keycommandprocessor()>
+    <h1>Mandelbrot Set &gt; Julia Set Explorer</h1>
+    <h2>written by Mike Harris, based on algorithms in The Science of Fractal Images</h2>
+    <p>Click on any point in the Mandelbrot set on left to see the corresponding Julia set on the right and the co-ordinates below.</p>
+    <p>colouring method: 
+      <select id="method" name="method">
+        <option value="lsm" selected="selected">Level Set Method (LSM)</option>
+        <option value="bdm">Binary Decomposition Method (BDM)</option>
+      </select>
+      <button onclick="mandelbrot()">reload</button>
+    </p>
+    <canvas id="mset_canvas" width="480" height="320" style="float:left" onclick="setcoords(event,this);julia(event,this)"></canvas>&nbsp;
+    <canvas id="jset_canvas" width="480" height="320"></canvas>
+    <br/>
+    cx: <input type="text" value="" name="cx" id="cx" value="0.0" />
+    cy: <input type="text" value="" name="cy" id="cy" value="0.0" />&nbsp;<button onclick="julia(event,this)">redraw julia set</button>
+   <p>There's also an archive of old Fractal work I did with Dan Grace back in the Eighties on the <a href="/fe3">Fractal Engine archive site</a>.</p>
+   <hr/>
+   <address>(c) 2009-2014 Mike Harris.  Free software released under GNU Public Licence v2.0.</address>
+  </body>
+</html>
