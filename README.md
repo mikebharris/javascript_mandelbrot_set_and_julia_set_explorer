@@ -1,3 +1,7 @@
+# JavaScript Mandelbrot and Julia Set Explorer
+
+![Mandelbrot's Baby](mset.png)
+
 Been playing a bit with HTML 5 and the ''canvas'' tag.  Using some JavaScript wizardry it's possible to have an interactive Mandelbrot and Julia set explorer, with no other code.  All that's left is to add a zoom function :P
 
 [Take a look at the Mandelbrot and Julia set generator using HTML 5 canvas element in action](https://mbharris.co.uk/fractals/mandlebrot-set-and-julia-set-explorer-in-html5.html).
