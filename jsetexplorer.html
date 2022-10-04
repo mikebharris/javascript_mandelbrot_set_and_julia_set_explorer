@@ -20,7 +20,7 @@
       }
     </style>
   </head>
-  <body onload="mandelbrot()" onkeypress=keycommandprocessor()>
+  <body onload="mandelbrot()" onkeypress=key_command_processor()>
     <h1>Mandelbrot Set &gt; Julia Set Explorer using HTML 5 Canvas element and JavaScript</h1>
     <h2>written by <a href="http://mbharris.co.uk">Mike Harris</a>, based on algorithms in The Science of Fractal Images.  <a href="https://github.com/mikebharris/canvas_mandelbrot_explorer">Fork this at GitHub</a></h2>
     <p>Click on the Mandelbrot set on left to see the corresponding Julia set on the right and the co-ordinates below.  If you turn <strong>Autodraw Julia Set Mode</strong> on then the Julia Set will draw automatically just by moving the mouse over the Mandelbrot Set.  Feel free to play with the number of iterations.  The higher the better the fidelity of the drawing, but the slower it is to draw.</p>
@@ -39,8 +39,8 @@
       </select>
     </p>
     <p>
-      <canvas id="mset_canvas" width="480" height="360" style="float:left" onmousemove="if (document.getElementById('autodraw').value == 'on') { setcoords(event,this);julia(event,this);}" onclick="setcoords(event,this);julia(event,this);"></canvas>&nbsp;
-      <canvas id="jset_canvas" width="480" height="320"></canvas>
+      <canvas id="mset_canvas" width="640" height="480" style="float:left" onmousemove="if (document.getElementById('autodraw').value == 'on') { set_coords(event,this);julia(event,this);}" onclick="set_coords(event,this);julia(event,this);"></canvas>&nbsp;
+      <canvas id="jset_canvas" width="640" height="480"></canvas>
     </p>
     <p>
     cx: <input type="text" value="" name="cx" id="cx" value="0.0" />

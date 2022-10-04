@@ -10,38 +10,37 @@
 //
 
 // set up a colour colour_palette for colouring the levels outside the set itself
-var colour_pallette = new Array("#000033", "#000066", "#000099", "#0000CC", "#0000FF", "#330000", "#330033", "#330066", "#330099", "#3300CC", "#660000", "#660033", "#660066", "#660099", "#6600CC", "#6600FF", "#990033", "#990066", "#990099", "#9900CC", "#9900FF", "#CC0033", "#CC0066", "#CC00CC", "#CC00FF", "#FF00FF");
-
-var number_of_colours = colour_pallette.length;
+const colour_pallette = ["#000033", "#000066", "#000099", "#0000CC", "#0000FF", "#330000", "#330033", "#330066", "#330099", "#3300CC", "#660000", "#660033", "#660066", "#660099", "#6600CC", "#6600FF", "#990033", "#990066", "#990099", "#9900CC", "#9900FF", "#CC0033", "#CC0066", "#CC00CC", "#CC00FF", "#FF00FF"];
+const number_of_colours = colour_pallette.length;
 
 // set up of 'screen' resolution, the size of our <canvas>
-var x_resolution = 480;
-var y_resolution = 320;
+const x_resolution = 640;
+const y_resolution = 480;
 
 // set up the size of our real and imaginary planes      
-var real_plane_minimum_value = -2.5;
-var real_plane_maximum_value = 0.8;
-var imaginary_plan_minimum_value = -1.25;
-var imaginary_plan_maximum_value = 1.25;
+const real_plane_minimum_value = -2.5;
+const real_plane_maximum_value = 0.8;
+const imaginary_plan_minimum_value = -1.25;
+const imaginary_plan_maximum_value = 1.25;
 
 // calculate the proportion in the difference between the points
 // on the mathematical plane and the actual screen resolution	
-var x_prop = (real_plane_maximum_value - real_plane_minimum_value) / (x_resolution - 1);
-var y_prop = (imaginary_plan_maximum_value - imaginary_plan_minimum_value) / (y_resolution - 1);
+const x_prop = (real_plane_maximum_value - real_plane_minimum_value) / (x_resolution - 1);
+const y_prop = (imaginary_plan_maximum_value - imaginary_plan_minimum_value) / (y_resolution - 1);
 
-var maxiter = 60;      // maximum number of iterations
-var threshold = 10000.00; // threashold above which value is considered to tend to infinity
+const maxiter = 60;      // maximum number of iterations
+const threshold = 10000.00; // threashold above which value is considered to tend to infinity
 // the coloured bands on the outside of our Mandelbrot Set are
 // a measure of how soon the values become unstable and hence the
 // point on the plane is not within the set itself, not bounded by the set
 
 function compute_point(point, cx, cy, maxiter, thresh) {
-    var x2 = point.x * point.x;
-    var y2 = point.y * point.y;
-    var iter = 0;
+    let x2 = point.x * point.x;
+    let y2 = point.y * point.y;
+    let iter = 0;
 
     while ((iter < maxiter) && ((x2 + y2) < thresh)) {
-        var temp = x2 - y2 + cx;
+        let temp = x2 - y2 + cx;
         point.y = 2 * point.x * point.y + cy;
         point.x = temp;
         x2 = point.x * point.x;
@@ -110,8 +109,8 @@ function box(ox, oy, dx, dy) {
 }
 
 function mandelbrot() {
-    var method = document.getElementById('method').value;
-    var maxiter = document.getElementById('iterations').value;
+    const method = document.getElementById('method').value;
+    const maxiter = document.getElementById('iterations').value;
     switch (method) {
         case 'bdm':
             mandelbrot_bdm(maxiter);
@@ -125,18 +124,18 @@ function mandelbrot() {
 
 // draw the mandelbrot set using the Level Set Method
 function mandelbrot_lsm(maxiter) {
-    var canvas = document.getElementById("mset_canvas");
-    var ctx = canvas.getContext("2d");
+    const canvas = document.getElementById("mset_canvas");
+    const ctx = canvas.getContext("2d");
 
-    for (var iy = 0; iy < y_resolution; iy++) {
+    for (let iy = 0; iy < y_resolution; iy++) {
 
-        var cy = imaginary_plan_minimum_value + iy * y_prop;
+        const cy = imaginary_plan_minimum_value + iy * y_prop;
 
-        for (var ix = 0; ix < x_resolution; ix++) {
+        for (let ix = 0; ix < x_resolution; ix++) {
 
-            var cx = real_plane_minimum_value + ix * x_prop;
-            var point = {x: 0.0, y: 0.0};
-            var iter = compute_point(point, cx, cy, maxiter, threshold);
+            const cx = real_plane_minimum_value + ix * x_prop;
+            const point = {x: 0.0, y: 0.0};
+            const iter = compute_point(point, cx, cy, maxiter, threshold);
 
             if (iter == maxiter) {
                 // if we didn't get to infinity by the time we
@@ -155,18 +154,18 @@ function mandelbrot_lsm(maxiter) {
 
 // draw the mandelbrot set using the Binary Decomposition Method
 function mandelbrot_bdm(maxiter) {
-    var canvas = document.getElementById("mset_canvas");
-    var ctx = canvas.getContext("2d");
+    const canvas = document.getElementById("mset_canvas");
+    const ctx = canvas.getContext("2d");
 
-    for (var iy = 0; iy < y_resolution; iy++) {
+    for (let iy = 0; iy < y_resolution; iy++) {
 
-        var cy = imaginary_plan_minimum_value + iy * y_prop;
+        const cy = imaginary_plan_minimum_value + iy * y_prop;
 
-        for (var ix = 0; ix < x_resolution; ix++) {
+        for (let ix = 0; ix < x_resolution; ix++) {
 
-            var cx = real_plane_minimum_value + ix * x_prop;
-            var point = {x: 0.0, y: 0.0};
-            var iter = compute_point(point, cx, cy, maxiter, threshold);
+            const cx = real_plane_minimum_value + ix * x_prop;
+            const point = {x: 0.0, y: 0.0};
+            const iter = compute_point(point, cx, cy, maxiter, threshold);
 
             if (iter == maxiter) {
                 // if we didn't get to infinity by the time we
@@ -188,8 +187,8 @@ function mandelbrot_bdm(maxiter) {
 }
 
 function julia() {
-    var method = document.getElementById("method").value;
-    var maxiter = document.getElementById('iterations').value;
+    const method = document.getElementById("method").value;
+    const maxiter = document.getElementById('iterations').value;
     switch (method) {
         case 'bdm':
             julia_bdm(maxiter);
@@ -202,30 +201,30 @@ function julia() {
 }
 
 function julia_lsm(maxiter) {
-    var canvas = document.getElementById("jset_canvas");
-    var ctx = canvas.getContext("2d");
-    var color_method = "lsm";
+    const canvas = document.getElementById("jset_canvas");
+    const ctx = canvas.getContext("2d");
+    const color_method = "lsm";
 
-    var x_min = -2.25;
-    var x_max = 2.25;
-    var y_min = -1.8;
-    var y_max = 1.8;
+    const x_min = -2.25;
+    const x_max = 2.25;
+    const y_min = -1.8;
+    const y_max = 1.8;
 
-    var x_prop = (x_max - x_min) / (x_resolution - 1);
-    var y_prop = (y_max - y_min) / (y_resolution - 1);
+    const x_prop = (x_max - x_min) / (x_resolution - 1);
+    const y_prop = (y_max - y_min) / (y_resolution - 1);
 
     // note these must use the Number object to 'cast' the
     // values to numbers (rather than strings)
-    var cx = new Number(document.getElementById('cx').value);
-    var cy = new Number(document.getElementById('cy').value);
+    const cx = Number(document.getElementById('cx').value);
+    const cy = Number(document.getElementById('cy').value);
 
-    for (var iy = 0; iy < y_resolution; iy++) {
+    for (let iy = 0; iy < y_resolution; iy++) {
 
-        var y = y_min + iy * y_prop;
-        for (var ix = 0; ix < x_resolution; ix++) {
+        const y = y_min + iy * y_prop;
+        for (let ix = 0; ix < x_resolution; ix++) {
 
-            var point = {x: x_min + ix * x_prop, y: y};
-            var iter = compute_point(point, cx, cy, maxiter, threshold);
+            const point = {x: x_min + ix * x_prop, y: y};
+            const iter = compute_point(point, cx, cy, maxiter, threshold);
 
             if (iter == maxiter) {
                 // if we didn't get to infinity by the time we
@@ -244,29 +243,29 @@ function julia_lsm(maxiter) {
 }
 
 function julia_bdm(maxiter) {
-    var canvas = document.getElementById("jset_canvas");
-    var ctx = canvas.getContext("2d");
+    const canvas = document.getElementById("jset_canvas");
+    const ctx = canvas.getContext("2d");
 
-    var x_min = -2.25;
-    var x_max = 2.25;
-    var y_min = -1.8;
-    var y_max = 1.8;
+    const x_min = -2.25;
+    const x_max = 2.25;
+    const y_min = -1.8;
+    const y_max = 1.8;
 
-    var x_prop = (x_max - x_min) / (x_resolution - 1);
-    var y_prop = (y_max - y_min) / (y_resolution - 1);
+    const x_prop = (x_max - x_min) / (x_resolution - 1);
+    const y_prop = (y_max - y_min) / (y_resolution - 1);
 
     // note these must use the Number object to 'cast' the
     // values to numbers (rather than strings)
-    var cx = new Number(document.getElementById('cx').value);
-    var cy = new Number(document.getElementById('cy').value);
+    const cx = Number(document.getElementById('cx').value);
+    const cy = Number(document.getElementById('cy').value);
 
-    for (var iy = 0; iy < y_resolution; iy++) {
+    for (let iy = 0; iy < y_resolution; iy++) {
 
-        var y = y_min + iy * y_prop;
-        for (var ix = 0; ix < x_resolution; ix++) {
+        const y = y_min + iy * y_prop;
+        for (let ix = 0; ix < x_resolution; ix++) {
 
-            var point = {x: x_min + ix * x_prop, y: y};
-            var iter = compute_point(point, cx, cy, maxiter, threshold);
+            const point = {x: x_min + ix * x_prop, y: y};
+            const iter = compute_point(point, cx, cy, maxiter, threshold);
 
             if (iter == maxiter) {
                 // if we didn't get to infinity by the time we
@@ -288,13 +287,12 @@ function julia_bdm(maxiter) {
     }
 }
 
-function setcoords(evt, obj) {
+function set_coords(evt, obj) {
+    const x_pos = evt.clientX - obj.offsetLeft;
+    const y_pos = evt.clientY - obj.offsetTop;
 
-    var x_pos = evt.clientX - obj.offsetLeft;
-    var y_pos = evt.clientY - obj.offsetTop;
-
-    var cx = real_plane_minimum_value + x_pos * x_prop;
-    var cy = imaginary_plan_minimum_value + y_pos * y_prop;
+    const cx = real_plane_minimum_value + x_pos * x_prop;
+    const cy = imaginary_plan_minimum_value + y_pos * y_prop;
 
     document.getElementById('cx').value = cx;
     document.getElementById('cy').value = cy;
@@ -319,12 +317,11 @@ function dcg_section(x0, y0, width, height) {
     y_mid = y0 + height % 2;
 }
 
-function keycommandprocessor(e) {
-
-    var evtobj = window.event ? event : e //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
-    var unicode = evtobj.charCode ? evtobj.charCode : evtobj.keyCode
-    var actualkey = String.fromCharCode(unicode)
+function key_command_processor(e) {
+    const evtobj = window.event ? event : e; //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
+    const unicode = evtobj.charCode ? evtobj.charCode : evtobj.keyCode;
+    const actualkey = String.fromCharCode(unicode);
     if (actualkey == "z") {
-        alert("zoom mode");
+        alert("zoom mode - coming soon");
     }
 }
