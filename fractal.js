@@ -152,7 +152,7 @@ function mandelbrot_lsm(maxiter) {
     }
 }
 
-// draw the mandelbrot set using the Binary Decomposition Method
+// draw the Mandelbrot Set using the Binary Decomposition Method
 function mandelbrot_bdm(maxiter) {
     const canvas = document.getElementById("mset_canvas");
     const ctx = canvas.getContext("2d");
@@ -170,7 +170,7 @@ function mandelbrot_bdm(maxiter) {
             if (iter == maxiter) {
                 // if we didn't get to infinity by the time we
                 // used up all the iterations, then we're in the set
-                // colour it bloack
+                // colour it black
                 ctx.fillStyle = "#000000";
             } else {
                 // color it depending on the angle of alpha
@@ -200,6 +200,7 @@ function julia() {
     }
 }
 
+// draw a Julia set using the Level Set Method
 function julia_lsm(maxiter) {
     const canvas = document.getElementById("jset_canvas");
     const ctx = canvas.getContext("2d");
@@ -229,7 +230,7 @@ function julia_lsm(maxiter) {
             if (iter == maxiter) {
                 // if we didn't get to infinity by the time we
                 // used up all the iterations, then we're in the set
-                // colour it bloack
+                // colour it black
                 ctx.fillStyle = "#000000";
             } else {
                 // otherwise colour it according to the number
