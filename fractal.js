@@ -10,7 +10,7 @@
 //
 
 // set up a colour colour_palette for colouring the levels outside the set itself
-const colour_palette = ["#000033", "#000066", "#000099", "#0000CC", "#0000FF", "#330000", "#330033", "#330066", "#330099", "#3300CC", "#660000", "#660033", "#660066", "#660099", "#6600CC", "#6600FF", "#990033", "#990066", "#990099", "#9900CC", "#9900FF", "#CC0033", "#CC0066", "#CC00CC", "#CC00FF", "#FF00FF"];
+const colour_palette = ['#00429d', '#1448a0', '#204fa3', '#2955a6', '#315ca9', '#3862ac', '#3f69af', '#466fb2', '#4c76b5', '#527db7', '#5884ba', '#5e8abd', '#6491c0', '#6a98c2', '#709fc5', '#76a6c8', '#7cadca', '#83b4cd', '#89bbcf', '#90c2d2', '#97c9d4', '#9fd0d6', '#a7d6d8', '#afddda', '#b8e4dc', '#c2eade', '#ccf1e0', '#d9f7e1', '#e8fce1', '#ffffe0']
 const number_of_colours = colour_palette.length;
 
 // set up of 'screen' resolution, the size of our <canvas>
