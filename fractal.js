@@ -10,8 +10,8 @@
 //
 
 // set up a colour colour_palette for colouring the levels outside the set itself
-const colour_pallette = ["#000033", "#000066", "#000099", "#0000CC", "#0000FF", "#330000", "#330033", "#330066", "#330099", "#3300CC", "#660000", "#660033", "#660066", "#660099", "#6600CC", "#6600FF", "#990033", "#990066", "#990099", "#9900CC", "#9900FF", "#CC0033", "#CC0066", "#CC00CC", "#CC00FF", "#FF00FF"];
-const number_of_colours = colour_pallette.length;
+const colour_palette = ["#000033", "#000066", "#000099", "#0000CC", "#0000FF", "#330000", "#330033", "#330066", "#330099", "#3300CC", "#660000", "#660033", "#660066", "#660099", "#6600CC", "#6600FF", "#990033", "#990066", "#990099", "#9900CC", "#9900FF", "#CC0033", "#CC0066", "#CC00CC", "#CC00FF", "#FF00FF"];
+const number_of_colours = colour_palette.length;
 
 // set up of 'screen' resolution, the size of our <canvas>
 const x_resolution = 640;
@@ -28,7 +28,6 @@ const imaginary_plan_maximum_value = 1.25;
 const x_prop = (real_plane_maximum_value - real_plane_minimum_value) / (x_resolution - 1);
 const y_prop = (imaginary_plan_maximum_value - imaginary_plan_minimum_value) / (y_resolution - 1);
 
-const maxiter = 60;      // maximum number of iterations
 const threshold = 10000.00; // threashold above which value is considered to tend to infinity
 // the coloured bands on the outside of our Mandelbrot Set are
 // a measure of how soon the values become unstable and hence the
@@ -50,80 +49,22 @@ function compute_point(point, cx, cy, maxiter, thresh) {
     return iter;
 }
 
-// divide and conquer box method
-function box(ox, oy, dx, dy) {
-    var colour_change = 0;
-    var colour = 0;
-
-    for (var ix = ox; ix < dx; ix++) {
-        var point = {x: 0.0, y: 0.0};
-        var cx = real_plane_minimum_value + ix * x_prop;
-        var cy = oy * y_prop; // top edge
-
-        colour = compute_and_plot_point(point, cx, cy, maxiter, threshold);
-        if (old_colour != colour) {
-            colour_change = 1
-        }
-        ;
-
-        var cy = dy * y_prop; // bottom edge
-        colour = compute_and_plot_point(point, cx, cy, maxiter, threshold);
-        if (old_colour != colour) {
-            colour_change = 1
-        }
-        ;
-    }
-
-    for (var iy = oy; iy < dy; iy++) {
-        var point = {x: 0.0, y: 0.0};
-        var cy = imaginary_plan_minimum_value + iy * y_prop;
-        var cx = ox * x_prop; // left edge
-        colour = compute_and_plot_point(point, cx, cy, maxiter, threshold);
-        if (old_colour != colour) {
-            colour_change = 1
-        }
-        ;
-
-        var cx = dx * x_prop; // right edge
-        colour = compute_and_plot_point(point, cx, cy, maxiter, threshold);
-        if (old_colour != colour) {
-            colour_change = 1
-        }
-        ;
-    }
-
-    if (colour_change == 0) {
-        // conquer
-        ctx.fillRect(ox, oy, dx, dy);
-    } else {
-        if (dx > dy) {
-            // wider, split into two verticaly
-            box(ox, oy, dx / 2, dy); // left half
-            box(dx / 2, oy, dx, dy); // right half
-        } else {
-            // taller, split horizontaly
-            box(ox, oy, dx, dy / 2); // top half
-            box(ox, dy / 2, dx, dy); // bottom half
-        }
-    }
-}
-
 function mandelbrot() {
     const method = document.getElementById('method').value;
-    const maxiter = document.getElementById('iterations').value;
+    const max_iters = document.getElementById('iterations').value;
     switch (method) {
         case 'bdm':
-            mandelbrot_bdm(maxiter);
+            mandelbrot_bdm(max_iters);
             break;
         case 'lsm':
         default:
-            mandelbrot_lsm(maxiter);
+            mandelbrot_lsm(max_iters);
             break;
     }
 }
 
 // draw the mandelbrot set using the Level Set Method
-function mandelbrot_lsm(maxiter) {
+function mandelbrot_lsm(max_iters) {
     const canvas = document.getElementById("mset_canvas");
     const ctx = canvas.getContext("2d");
 
@@ -135,9 +76,9 @@ function mandelbrot_lsm(maxiter) {
 
             const cx = real_plane_minimum_value + ix * x_prop;
             const point = {x: 0.0, y: 0.0};
-            const iter = compute_point(point, cx, cy, maxiter, threshold);
+            const iter = compute_point(point, cx, cy, max_iters, threshold);
 
-            if (iter == maxiter) {
+            if (iter == max_iters) {
                 // if we didn't get to infinity by the time we
                 // used up all the iterations, then we're in the set
                 // colour it bloack
@@ -145,7 +86,7 @@ function mandelbrot_lsm(maxiter) {
             } else {
                 // otherwise colour it according to the number
                 // of iterations it took to get to infinity (threshold)
-                ctx.fillStyle = colour_pallette[iter % number_of_colours];
+                ctx.fillStyle = colour_palette[iter % number_of_colours];
             }
             ctx.fillRect(ix, iy, 1, 1);
         }
@@ -153,7 +94,7 @@ function mandelbrot_lsm(maxiter) {
 }
 
 // draw the Mandelbrot Set using the Binary Decomposition Method
-function mandelbrot_bdm(maxiter) {
+function mandelbrot_bdm(max_iters) {
     const canvas = document.getElementById("mset_canvas");
     const ctx = canvas.getContext("2d");
 
@@ -165,16 +106,16 @@ function mandelbrot_bdm(maxiter) {
 
             const cx = real_plane_minimum_value + ix * x_prop;
             const point = {x: 0.0, y: 0.0};
-            const iter = compute_point(point, cx, cy, maxiter, threshold);
+            const iter = compute_point(point, cx, cy, max_iters, threshold);
 
-            if (iter == maxiter) {
+            if (iter == max_iters) {
                 // if we didn't get to infinity by the time we
                 // used up all the iterations, then we're in the set
                 // colour it black
                 ctx.fillStyle = "#000000";
             } else {
                 // color it depending on the angle of alpha
-                var alpha = Math.atan(point.y);
+                const alpha = Math.atan(point.y);
                 if ((alpha >= 0) && (alpha <= 3)) {
                     ctx.fillStyle = "#fff";
                 } else {
@@ -188,14 +129,14 @@ function mandelbrot_bdm(maxiter) {
 
 function julia() {
     const method = document.getElementById("method").value;
-    const maxiter = document.getElementById('iterations').value;
+    const max_iters = document.getElementById('iterations').value;
     switch (method) {
         case 'bdm':
-            julia_bdm(maxiter);
+            julia_bdm(max_iters);
             break;
         case 'lsm':
         default:
-            julia_lsm(maxiter);
+            julia_lsm(max_iters);
             break;
     }
 }
@@ -235,7 +176,7 @@ function julia_lsm(maxiter) {
             } else {
                 // otherwise colour it according to the number
                 // of iterations it took to get to infinity (threshold)
-                ctx.fillStyle = colour_pallette[iter % number_of_colours];
+                ctx.fillStyle = colour_palette[iter % number_of_colours];
             }
 
             ctx.fillRect(ix, iy, 1, 1);
@@ -299,30 +240,11 @@ function set_coords(evt, obj) {
     document.getElementById('cy').value = cy;
 }
 
-// not currently used
-function dcg_section(x0, y0, width, height) {
-
-    var x1;
-    var y1;
-    var x_mid;
-    var y_mid;
-
-    var mono = true;
-
-    // get colour of point (x0, y0)
-    // col = ptst(x0,y0)
-
-    x1 = x0 + width - 1;
-    y1 = y0 + height - 1;
-    x_mid = x0 + width % 2;
-    y_mid = y0 + height % 2;
-}
-
 function key_command_processor(e) {
     const evtobj = window.event ? event : e; //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
     const unicode = evtobj.charCode ? evtobj.charCode : evtobj.keyCode;
     const actualkey = String.fromCharCode(unicode);
-    if (actualkey == "z") {
+    if (actualkey === "z") {
         alert("zoom mode - coming soon");
     }
 }
