@@ -39,6 +39,13 @@
       </select>
     </p>
     <p>
+      colour palette: <select id="palette" name="palette" onchange="mandelbrot()">
+      <option value="0" selected>Palette 0</option>
+      <option value="1">Palette 1</option>
+      <option value="2">Palette 2</option>
+    </select>
+    </p>
+    <p>
       <canvas id="mset_canvas" width="640" height="480" style="float:left" onmousemove="if (document.getElementById('autodraw').value == 'on') { set_coords(event,this);julia(event,this);}" onclick="set_coords(event,this);julia(event,this);"></canvas>&nbsp;
       <canvas id="jset_canvas" width="640" height="480"></canvas>
     </p>

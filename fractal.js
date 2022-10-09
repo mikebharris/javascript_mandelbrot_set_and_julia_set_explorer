@@ -9,9 +9,8 @@
 // Free software released under GNU Public Licence v2.0.
 //
 
-// set up a colour colour_palette for colouring the levels outside the set itself
-const colour_palette = ['#00429d', '#1448a0', '#204fa3', '#2955a6', '#315ca9', '#3862ac', '#3f69af', '#466fb2', '#4c76b5', '#527db7', '#5884ba', '#5e8abd', '#6491c0', '#6a98c2', '#709fc5', '#76a6c8', '#7cadca', '#83b4cd', '#89bbcf', '#90c2d2', '#97c9d4', '#9fd0d6', '#a7d6d8', '#afddda', '#b8e4dc', '#c2eade', '#ccf1e0', '#d9f7e1', '#e8fce1', '#ffffe0']
-const number_of_colours = colour_palette.length;
+// set up colour palettes for colouring the levels outside the set itself
+const colour_palettes = [['#00429d', '#1448a0', '#204fa3', '#2955a6', '#315ca9', '#3862ac', '#3f69af', '#466fb2', '#4c76b5', '#527db7', '#5884ba', '#5e8abd', '#6491c0', '#6a98c2', '#709fc5', '#76a6c8', '#7cadca', '#83b4cd', '#89bbcf', '#90c2d2', '#97c9d4', '#9fd0d6', '#a7d6d8', '#afddda', '#b8e4dc', '#c2eade', '#ccf1e0', '#d9f7e1', '#e8fce1', '#ffffe0'], ['#94003a', '#98163e', '#9c2341', '#a12e45', '#a53849', '#a9414d', '#ae4951', '#b25155', '#b65959', '#ba615e', '#be6962', '#c27167', '#c6796b', '#ca8070', '#cd8874', '#d19079', '#d5977e', '#d99f83', '#dca689', '#e0ae8e', '#e3b694', '#e7bd9a', '#eac5a0', '#edcda6', '#f1d4ad', '#f4dcb4', '#f7e4bc', '#faebc5', '#fdf3cf', '#fffadf'],['#890079', '#8c197d', '#8e2881', '#903385', '#933d89', '#95478d', '#975091', '#995995', '#9b619a', '#9d699e', '#9f71a2', '#a179a6', '#a281aa', '#a489af', '#a691b3', '#a798b7', '#a9a0bc', '#aba8c0', '#adafc5', '#afb7c9', '#b1bece', '#b3c6d2', '#b6cdd7', '#b8d5dc', '#bcdce1', '#c0e3e6', '#c5eaeb', '#ccf0f1', '#d5f6f7', '#e9f9ff']]
 
 // set up of 'screen' resolution, the size of our <canvas>
 const x_resolution = 640;
@@ -52,19 +51,21 @@ function compute_point(point, cx, cy, maxiter, thresh) {
 function mandelbrot() {
     const method = document.getElementById('method').value;
     const max_iters = document.getElementById('iterations').value;
+
     switch (method) {
         case 'bdm':
             mandelbrot_bdm(max_iters);
             break;
         case 'lsm':
         default:
-            mandelbrot_lsm(max_iters);
+            const palette_num = document.getElementById('palette').value;
+            mandelbrot_lsm(max_iters, palette_num);
             break;
     }
 }
 
 // draw the mandelbrot set using the Level Set Method
-function mandelbrot_lsm(max_iters) {
+function mandelbrot_lsm(max_iters, palette_num) {
     const canvas = document.getElementById("mset_canvas");
     const ctx = canvas.getContext("2d");
 
@@ -86,7 +87,7 @@ function mandelbrot_lsm(max_iters) {
             } else {
                 // otherwise colour it according to the number
                 // of iterations it took to get to infinity (threshold)
-                ctx.fillStyle = colour_palette[iter % number_of_colours];
+                ctx.fillStyle = colour_palettes[palette_num][iter % colour_palettes[palette_num].length];
             }
             ctx.fillRect(ix, iy, 1, 1);
         }
@@ -136,13 +137,14 @@ function julia() {
             break;
         case 'lsm':
         default:
-            julia_lsm(max_iters);
+            const palette_num = document.getElementById('palette').value;
+            julia_lsm(max_iters, palette_num);
             break;
     }
 }
 
 // draw a Julia set using the Level Set Method
-function julia_lsm(maxiter) {
+function julia_lsm(maxiter, palette_num) {
     const canvas = document.getElementById("jset_canvas");
     const ctx = canvas.getContext("2d");
     const color_method = "lsm";
@@ -176,7 +178,7 @@ function julia_lsm(maxiter) {
             } else {
                 // otherwise colour it according to the number
                 // of iterations it took to get to infinity (threshold)
-                ctx.fillStyle = colour_palette[iter % number_of_colours];
+                ctx.fillStyle = colour_palettes[palette_num][iter % colour_palettes[palette_num].length];
             }
             ctx.fillRect(ix, iy, 1, 1);
         }
