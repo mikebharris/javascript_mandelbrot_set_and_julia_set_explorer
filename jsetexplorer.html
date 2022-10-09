@@ -30,8 +30,8 @@
 	<option value="bdm">Binary Decomposition Method (BDM)</option>
       </select>
       Iterations:
-      <input id="iterations" type="range" min="10" max="500" value="30" step="5" onchange="document.getElementById('num_iters').innerHTML = this.value" />
-      (<span id="num_iters">30</span>)
+      <input id="iterations" type="range" min="30" max="1000" value="100" step="5" onchange="document.getElementById('num_iters').innerHTML = this.value" />
+      (<span id="num_iters">100</span>)
       <button onclick="mandelbrot();">Redraw MSet</button>
       <select id="autodraw" name="autodraw">
 	<option value="off" selected="selected">Autodraw Julia Set Mode Off</option>
