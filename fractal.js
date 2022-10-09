@@ -178,7 +178,6 @@ function julia_lsm(maxiter) {
                 // of iterations it took to get to infinity (threshold)
                 ctx.fillStyle = colour_palette[iter % number_of_colours];
             }
-
             ctx.fillRect(ix, iy, 1, 1);
         }
     }
@@ -216,7 +215,7 @@ function julia_bdm(maxiter) {
                 ctx.fillStyle = "#000000";
             } else {
                 // color it depending on the angle of alpha
-                var alpha = Math.atan(point.y);
+                const alpha = Math.atan(point.y);
                 if ((alpha >= 0) && (alpha <= 3)) {
                     ctx.fillStyle = "#fff";
                 } else {
