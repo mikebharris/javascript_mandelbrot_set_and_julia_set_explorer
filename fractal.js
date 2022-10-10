@@ -1,8 +1,6 @@
 //
 // JavaScript methods to draw Mandelbrot and Julia Sets
 //
-// Written by mike@mbharris.co.uk
-//
 // version 1.2 - featuring LSM and BDM methods, iterations slider and auto draw julia set mode
 //
 // (c) 2009-2015 Mike Harris.  
@@ -41,139 +39,27 @@ const threshold = 10000.00; // threashold above which value is considered to ten
 // a measure of how soon the values become unstable and hence the
 // point on the plane is not within the set itself, not bounded by the set
 
-function compute_point(point, cx, cy, maxiter, thresh) {
-    let x2 = point.x * point.x;
-    let y2 = point.y * point.y;
-    let iter = 0;
-
-    while ((iter < maxiter) && ((x2 + y2) < thresh)) {
-        let temp = x2 - y2 + cx;
-        point.y = 2 * point.x * point.y + cy;
-        point.x = temp;
-        x2 = point.x * point.x;
-        y2 = point.y * point.y;
-        iter++;
-    }
-    return iter;
-}
-
 function mandelbrot() {
-    const method = document.getElementById('method').value;
-    const max_iters = document.getElementById('iterations').value;
-
-    switch (method) {
-        case 'bdm':
-            mandelbrot_bdm(max_iters, set_colour_bdm);
-            break;
-        case 'lsm':
-        default:
-            const palette_num = document.getElementById('palette').value;
-            mandelbrot_lsm(max_iters, set_colour_lsm);
-            break;
-    }
+    draw(document.getElementById("mset_canvas"), draw_mandelbrot)
 }
-
 function julia() {
-    const method = document.getElementById("method").value;
+    draw(document.getElementById("jset_canvas"), draw_julia)
+}
+function draw(canvas, set_drawing_func) {
+    const ctx = canvas.getContext("2d");
     const max_iters = document.getElementById('iterations').value;
+    const method = document.getElementById('method').value;
 
+    set_drawing_func(ctx, max_iters, get_colouring_function(method))
+}
+
+function get_colouring_function(method) {
     switch (method) {
         case 'bdm':
-            julia_bdm(max_iters, set_colour_bdm);
-            break;
+            return set_colour_bdm
         case 'lsm':
         default:
-            const palette_num = document.getElementById('palette').value;
-            julia_lsm(max_iters, set_colour_lsm);
-            break;
-    }
-}
-
-function set_colour_lsm(iter, max_iters, ctx) {
-    if (iter == max_iters) {
-        // if we didn't get to infinity by the time we
-        // used up all the iterations, then we're in the set
-        // colour it bloack
-        ctx.fillStyle = "#000000";
-    } else {
-        // otherwise colour it according to the number
-        // of iterations it took to get to infinity (threshold)
-        const palette_num = document.getElementById('palette').value;
-        ctx.fillStyle = colour_palettes[palette_num][iter % colour_palettes[palette_num].length];
-    }
-}
-
-// draw the mandelbrot set using the Level Set Method
-function mandelbrot_lsm(max_iters, set_colour_func) {
-    const canvas = document.getElementById("mset_canvas");
-    const ctx = canvas.getContext("2d");
-
-    for (let iy = 0; iy < y_resolution; iy++) {
-
-        const cy = imaginary_plan_minimum_value + iy * y_prop;
-
-        for (let ix = 0; ix < x_resolution; ix++) {
-
-            const cx = real_plane_minimum_value + ix * x_prop;
-            const point = {x: 0.0, y: 0.0};
-            const iter = compute_point(point, cx, cy, max_iters, threshold);
-            set_colour_func(iter, max_iters, ctx);
-            ctx.fillRect(ix, iy, 1, 1);
-        }
-    }
-}
-
-// draw the Mandelbrot Set using the Binary Decomposition Method
-function mandelbrot_bdm(max_iters, set_colour_func) {
-    const canvas = document.getElementById("mset_canvas");
-    const ctx = canvas.getContext("2d");
-
-    for (let iy = 0; iy < y_resolution; iy++) {
-
-        const cy = imaginary_plan_minimum_value + iy * y_prop;
-
-        for (let ix = 0; ix < x_resolution; ix++) {
-
-            const cx = real_plane_minimum_value + ix * x_prop;
-            const point = {x: 0.0, y: 0.0};
-            const iter = compute_point(point, cx, cy, max_iters, threshold);
-
-            set_colour_func(iter, max_iters, ctx, point)
-            ctx.fillRect(ix, iy, 1, 1);
-        }
-    }
-}
-
-// draw a Julia set using the Level Set Method
-function julia_lsm(max_iters, set_colour_func) {
-    const canvas = document.getElementById("jset_canvas");
-    const ctx = canvas.getContext("2d");
-    const color_method = "lsm";
-
-    const x_min = -2.25;
-    const x_max = 2.25;
-    const y_min = -1.8;
-    const y_max = 1.8;
-
-    const x_prop = (x_max - x_min) / (x_resolution - 1);
-    const y_prop = (y_max - y_min) / (y_resolution - 1);
-
-    // note these must use the Number object to 'cast' the
-    // values to numbers (rather than strings)
-    const cx = Number(document.getElementById('cx').value);
-    const cy = Number(document.getElementById('cy').value);
-
-    for (let iy = 0; iy < y_resolution; iy++) {
-
-        const y = y_min + iy * y_prop;
-        for (let ix = 0; ix < x_resolution; ix++) {
-
-            const point = {x: x_min + ix * x_prop, y: y};
-            const iter = compute_point(point, cx, cy, max_iters, threshold);
-
-            set_colour_func(iter, max_iters, ctx, point)
-            ctx.fillRect(ix, iy, 1, 1);
-        }
+            return set_colour_lsm
     }
 }
 
@@ -194,10 +80,38 @@ function set_colour_bdm(iter, maxiter, ctx, point) {
     }
 }
 
-function julia_bdm(max_iters, set_colour_func) {
-    const canvas = document.getElementById("jset_canvas");
-    const ctx = canvas.getContext("2d");
+function set_colour_lsm(iter, max_iters, ctx) {
+    if (iter == max_iters) {
+        // if we didn't get to infinity by the time we
+        // used up all the iterations, then we're in the set
+        // colour it bloack
+        ctx.fillStyle = "#000000";
+    } else {
+        // otherwise colour it according to the number
+        // of iterations it took to get to infinity (threshold)
+        const palette_num = document.getElementById('palette').value;
+        ctx.fillStyle = colour_palettes[palette_num][iter % colour_palettes[palette_num].length];
+    }
+}
 
+// draw the Mandelbrot Set
+function draw_mandelbrot(ctx, max_iters, set_colour_func) {
+    for (let iy = 0; iy < y_resolution; iy++) {
+        const cy = imaginary_plan_minimum_value + iy * y_prop;
+
+        for (let ix = 0; ix < x_resolution; ix++) {
+            const cx = real_plane_minimum_value + ix * x_prop;
+            const point = {x: 0.0, y: 0.0};
+            const iter = compute_point(point, cx, cy, max_iters, threshold);
+
+            set_colour_func(iter, max_iters, ctx, point);
+            ctx.fillRect(ix, iy, 1, 1);
+        }
+    }
+}
+
+// draw a Julia set
+function draw_julia(ctx, max_iters, set_colour_func) {
     const x_min = -2.25;
     const x_max = 2.25;
     const y_min = -1.8;
@@ -206,23 +120,36 @@ function julia_bdm(max_iters, set_colour_func) {
     const x_prop = (x_max - x_min) / (x_resolution - 1);
     const y_prop = (y_max - y_min) / (y_resolution - 1);
 
-    // note these must use the Number object to 'cast' the
-    // values to numbers (rather than strings)
     const cx = Number(document.getElementById('cx').value);
     const cy = Number(document.getElementById('cy').value);
 
     for (let iy = 0; iy < y_resolution; iy++) {
-
         const y = y_min + iy * y_prop;
-        for (let ix = 0; ix < x_resolution; ix++) {
 
+        for (let ix = 0; ix < x_resolution; ix++) {
             const point = {x: x_min + ix * x_prop, y: y};
             const iter = compute_point(point, cx, cy, max_iters, threshold);
-            set_colour_func(iter, max_iters, ctx, point);
 
+            set_colour_func(iter, max_iters, ctx, point)
             ctx.fillRect(ix, iy, 1, 1);
         }
     }
+}
+
+function compute_point(point, cx, cy, maxiter, thresh) {
+    let x2 = point.x * point.x;
+    let y2 = point.y * point.y;
+    let iter = 0;
+
+    while ((iter < maxiter) && ((x2 + y2) < thresh)) {
+        let temp = x2 - y2 + cx;
+        point.y = 2 * point.x * point.y + cy;
+        point.x = temp;
+        x2 = point.x * point.x;
+        y2 = point.y * point.y;
+        iter++;
+    }
+    return iter;
 }
 
 function set_coords(evt, obj) {
