@@ -22,6 +22,18 @@ const colour_palettes =
 const x_resolution = document.getElementById("mset_canvas").clientWidth;
 const y_resolution = document.getElementById("mset_canvas").clientHeight;
 
+function init() {
+    document.getElementById("palette").setAttribute("max", colour_palettes.length.toString())
+}
+
+function select_method() {
+    if (document.getElementById('method').value === 'lsm') {
+        document.getElementById("palette_chooser").style.display='inline'
+    } else {
+        document.getElementById("palette_chooser").style.display='none'
+    }
+}
+
 function mandelbrot() {
     draw(document.getElementById("mset_canvas"), draw_mandelbrot)
 }
