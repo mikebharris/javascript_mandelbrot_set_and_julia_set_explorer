@@ -1,65 +1,77 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>HTML 5 Canvas and JavaScript Mandelbrot set and Julia set explorer</title>
     <style>
-      h1 {
-      font-size:1.2em;
-      }
-      
-      h2 {
-      font-size:1.0em;
-      }
-      
-      p {
-      font-size:0.8em;
-      }
-      
-      address {
-      font-size:0.6em;
-      }
+        h1 {
+            font-size: 1.2em;
+        }
+
+        h2 {
+            font-size: 1.0em;
+        }
+
+        p {
+            font-size: 0.8em;
+        }
+
+        address {
+            font-size: 0.6em;
+        }
     </style>
-  </head>
-  <body onload="mandelbrot()" onkeypress=key_command_processor()>
-    <h1>Mandelbrot Set &gt; Julia Set Explorer using HTML 5 Canvas element and JavaScript</h1>
-    <h2>written by <a href="http://mbharris.co.uk">Mike Harris</a>, based on algorithms in The Science of Fractal Images.  <a href="https://github.com/mikebharris/canvas_mandelbrot_explorer">Fork this at GitHub</a></h2>
-    <p>Click on the Mandelbrot set on left to see the corresponding Julia set on the right and the co-ordinates below.  If you turn <strong>Autodraw Julia Set Mode</strong> on then the Julia Set will draw automatically just by moving the mouse over the Mandelbrot Set.  Feel free to play with the number of iterations.  The higher the better the fidelity of the drawing, but the slower it is to draw.</p>
-    <p>colouring method: 
-      <select id="method" name="method" onchange="mandelbrot()">
-	<option value="lsm" selected="selected">Level Set Method (LSM)</option>
-	<option value="bdm">Binary Decomposition Method (BDM)</option>
-      </select>
-      Iterations:
-      <input id="iterations" type="range" min="30" max="1000" value="100" step="5" onchange="document.getElementById('num_iters').innerHTML = this.value" />
-      (<span id="num_iters">100</span>)
-      <button onclick="mandelbrot();">Redraw MSet</button>
-      <select id="autodraw" name="autodraw">
-	<option value="off" selected="selected">Autodraw Julia Set Mode Off</option>
-	<option value="on">Autodraw Julia Set Mode On</option>
-      </select>
-    </p>
-    <p>
-      colour palette: <select id="palette" name="palette" onchange="mandelbrot()">
-      <option value="0" selected>Palette 0</option>
-      <option value="1">Palette 1</option>
-      <option value="2">Palette 2</option>
-      <option value="3">Palette 3</option>
-      <option value="4">Palette 4</option>
-      <option value="5">Palette 5</option>
-      <option value="6">Palette 6</option>
-      <option value="7">Palette 7</option>
+</head>
+<body onload="mandelbrot()" onkeypress=key_command_processor()>
+<h1>Mandelbrot Set &gt; Julia Set Explorer using HTML 5 Canvas element and JavaScript</h1>
+<h2>written by <a href="http://mbharris.co.uk">Mike Harris</a>, based on algorithms in The Science of Fractal Images. <a
+        href="https://github.com/mikebharris/canvas_mandelbrot_explorer">Fork this at GitHub</a></h2>
+<p>Click on the Mandelbrot set on left to see the corresponding Julia set on the right and the co-ordinates below. If
+    you turn <strong>Autodraw Julia Set Mode</strong> on then the Julia Set will draw automatically just by moving the
+    mouse over the Mandelbrot Set. Feel free to play with the number of iterations. The higher the better the fidelity
+    of the drawing, but the slower it is to draw.</p>
+<p>colouring method:
+    <select id="method" name="method" onchange="mandelbrot()">
+        <option value="lsm" selected="selected">Level Set Method (LSM)</option>
+        <option value="bdm">Binary Decomposition Method (BDM)</option>
     </select>
-    </p>
-    <p>
-      <canvas id="mset_canvas" width="640" height="480" style="float:left" onmousemove="if (document.getElementById('autodraw').value == 'on') { set_jset_coords(event,this);julia(event,this);}" onclick="set_jset_coords(event,this);julia(event,this);"></canvas>&nbsp;
-      <canvas id="jset_canvas" width="640" height="480"></canvas>
-    </p>
-    <p>
-    cx: <input type="text" value="" name="cx" id="cx" value="0.0" />
-    cy: <input type="text" value="" name="cy" id="cy" value="0.0" />&nbsp;<button onclick="julia(event,this)">redraw julia set</button></p>
-   <p>There's also an archive of old Fractal work I did with Dan Grace back in the Eighties on the <a href="http://mbharris.co.uk/mandlebrot-set-and-julia-set-generator-for-atari-st/">Fractal Engine archive site</a>.</p>
-   <hr/>
-   <address>(c) 2009-2015 Mike Harris.  Free software released under GNU Public Licence v2.0.</address>
-   <script type="application/x-javascript" src="fractal.js"></script>
-  </body>
+    Iterations:
+    <input id="iterations" type="range" min="30" max="1000" value="100" step="5"
+           onchange="document.getElementById('num_iters').innerHTML = this.value"/>
+    (<span id="num_iters">100</span>)
+    <button onclick="mandelbrot();">Redraw MSet</button>
+    <select id="autodraw" name="autodraw">
+        <option value="off" selected="selected">Autodraw Julia Set Mode Off</option>
+        <option value="on">Autodraw Julia Set Mode On</option>
+    </select>
+</p>
+<p>
+    colour palette: <select id="palette" name="palette" onchange="mandelbrot()">
+    <option value="0" selected>Palette 0</option>
+    <option value="1">Palette 1</option>
+    <option value="2">Palette 2</option>
+    <option value="3">Palette 3</option>
+    <option value="4">Palette 4</option>
+    <option value="5">Palette 5</option>
+    <option value="6">Palette 6</option>
+    <option value="7">Palette 7</option>
+</select>
+</p>
+<p>
+    <canvas id="mset_canvas" width="640" height="480" style="float:left"
+            onmousemove="if (document.getElementById('autodraw').value == 'on') { set_jset_coords(event,this);julia(event,this);}"
+            onclick="set_jset_coords(event,this);julia(event,this);"></canvas>&nbsp;
+    <canvas id="jset_canvas" width="640" height="480"></canvas>
+</p>
+<p>
+    cx: <input type="text" value="" name="cx" id="cx" value="0.0"/>
+    cy: <input type="text" value="" name="cy" id="cy" value="0.0"/>&nbsp;<button onclick="julia(event,this)">redraw
+    julia set
+</button>
+</p>
+<p>There's also an archive of old Fractal work I did with Dan Grace back in the Eighties on the <a
+        href="http://mbharris.co.uk/mandlebrot-set-and-julia-set-generator-for-atari-st/">Fractal Engine archive
+    site</a>.</p>
+<hr/>
+<address>(c) 2009-2015 Mike Harris. Free software released under GNU Public Licence v2.0.</address>
+<script type="application/x-javascript" src="fractal.js"></script>
+</body>
 </html>
