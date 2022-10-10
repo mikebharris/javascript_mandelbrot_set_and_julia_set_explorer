@@ -22,6 +22,9 @@ const colourPalettes =
 const xResolution = document.getElementById("mset_canvas").clientWidth;
 const yResolution = document.getElementById("mset_canvas").clientHeight;
 
+const defaultMsetPlane = {x_min: -2.5, y_min: -1.25, x_max: 0.8, y_max: 1.25};
+const defaultJsetPlane = {x_min: -2.25, y_min: -1.8, x_max: 2.25, y_max: 1.8};
+
 function init() {
     document.getElementById("palette").setAttribute("max", colourPalettes.length.toString())
 }
@@ -35,19 +38,20 @@ function selectMethod() {
 }
 
 function mandelbrot() {
-    drawSet(document.getElementById("mset_canvas"), drawMandelbrotSet)
+    drawSet(document.getElementById("mset_canvas"), drawMandelbrotSet, defaultMsetPlane)
+
 }
 
 function julia() {
-    drawSet(document.getElementById("jset_canvas"), drawJuliaSet)
+    drawSet(document.getElementById("jset_canvas"), drawJuliaSet, defaultJsetPlane)
 }
 
-function drawSet(canvas, setDrawingFunc) {
+function drawSet(canvas, setDrawingFunc, plane) {
     const ctx = canvas.getContext("2d");
     const max_iters = document.getElementById('iterations').value;
     const method = document.getElementById('method').value;
 
-    setDrawingFunc(ctx, max_iters, getColouringFunctionForMethod(method))
+    setDrawingFunc(ctx, max_iters, getColouringFunctionForMethod(method), plane)
 }
 
 function getColouringFunctionForMethod(method) {
@@ -91,19 +95,14 @@ function setColourUsingLevelSetMethod(iterations, maxIterations, ctx) {
     }
 }
 
-function drawMandelbrotSet(ctx, maxIterations, pointColouringFunc) {
-    const x_min = -2.5;
-    const x_max = 0.8;
-    const y_min = -1.25;
-    const y_max = 1.25;
-
-    const scalingFactor = getScalingFactors(x_max, x_min, y_max, y_min);
+function drawMandelbrotSet(ctx, maxIterations, pointColouringFunc, plane) {
+    const scalingFactor = getScalingFactors(plane);
 
     for (let iy = 0; iy < yResolution; iy++) {
-        const cy = y_min + iy * scalingFactor.y;
+        const cy = plane.y_min + iy * scalingFactor.y;
 
         for (let ix = 0; ix < xResolution; ix++) {
-            const cx = x_min + ix * scalingFactor.x;
+            const cx = plane.x_min + ix * scalingFactor.x;
             const currentPoint = {x: 0.0, y: 0.0};
             const iterations = computePoint(currentPoint, cx, cy, maxIterations);
 
@@ -113,43 +112,38 @@ function drawMandelbrotSet(ctx, maxIterations, pointColouringFunc) {
     }
 }
 
-function getScalingFactors(x_max, x_min, y_max, y_min) {
+function getScalingFactors(plane) {
     // calculate the proportion in the difference between the points
     // on the mathematical plane and the actual canvas size
-    return {x: (x_max - x_min) / (xResolution - 1), y: (y_max - y_min) / (yResolution - 1)}
+    return {x: (plane.x_max - plane.x_min) / (xResolution - 1), y: (plane.y_max - plane.y_min) / (yResolution - 1)}
 }
 
-function drawJuliaSet(ctx, maxiumumIterations, pointColouringFunc) {
-    const x_min = -2.25;
-    const x_max = 2.25;
-    const y_min = -1.8;
-    const y_max = 1.8;
-
-    const scalingFactor = getScalingFactors(x_max, x_min, y_max, y_min);
+function drawJuliaSet(ctx, maxIterations, pointColouringFunc, plane) {
+    const scalingFactor = getScalingFactors(plane);
 
     const cx = Number(document.getElementById('cx').value);
     const cy = Number(document.getElementById('cy').value);
 
     for (let iy = 0; iy < yResolution; iy++) {
-        const y = y_min + iy * scalingFactor.y;
+        const y = plane.y_min + iy * scalingFactor.y;
 
         for (let ix = 0; ix < xResolution; ix++) {
-            const currentPoint = {x: x_min + ix * scalingFactor.x, y: y};
-            const iterations = computePoint(currentPoint, cx, cy, maxiumumIterations);
+            const currentPoint = {x: plane.x_min + ix * scalingFactor.x, y: y};
+            const iterations = computePoint(currentPoint, cx, cy, maxIterations);
 
-            pointColouringFunc(iterations, maxiumumIterations, ctx, currentPoint)
+            pointColouringFunc(iterations, maxIterations, ctx, currentPoint)
             ctx.fillRect(ix, iy, 1, 1);
         }
     }
 }
 
-function computePoint(point, cx, cy, maximumIterations) {
+function computePoint(point, cx, cy, maxIterations) {
     const threshold = 10000.00; // threshold above which value is considered to tend to infinity
 
     let x2 = point.x * point.x;
     let y2 = point.y * point.y;
     let iterations = 0;
-    while ((iterations < maximumIterations) && ((x2 + y2) < threshold)) {
+    while ((iterations < maxIterations) && ((x2 + y2) < threshold)) {
         let temp = x2 - y2 + cx;
         point.y = 2 * point.x * point.y + cy;
         point.x = temp;
@@ -164,15 +158,10 @@ function setJuliaSetCoordinates(evt, obj) {
     const x_pos = evt.clientX - obj.offsetLeft;
     const y_pos = evt.clientY - obj.offsetTop;
 
-    const x_min = -2.5;
-    const x_max = 0.8;
-    const y_min = -1.25;
-    const y_max = 1.25;
+    let scalingFactors = getScalingFactors(defaultMsetPlane);
 
-    let scalingFactors = getScalingFactors(x_max, x_min, y_max, y_min);
-
-    const cx = x_min + x_pos * scalingFactors.x;
-    const cy = y_min + y_pos * scalingFactors.y;
+    const cx = defaultMsetPlane.x_min + x_pos * scalingFactors.x;
+    const cy = defaultMsetPlane.y_min + y_pos * scalingFactors.y;
 
     document.getElementById('cx').value = cx;
     document.getElementById('cy').value = cy;
