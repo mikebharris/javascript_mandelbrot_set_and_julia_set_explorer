@@ -19,32 +19,17 @@ const colour_palettes =
         ['#007ca6', '#0986ac', '#198fb2', '#2999b8', '#39a3bf', '#48acc5', '#59b5cb', '#69bed1', '#7ac7d7', '#8ccfdc', '#9ed8e2', '#b0e0e8', '#c3e8ee', '#d7f0f4', '#ebf8f9', '#e8f7ea', '#e3f0eb', '#dde8ed', '#d7e1ee', '#d1daef', '#cbd3f0', '#c4cbf1', '#bdc4f2', '#b7bdf2', '#afb6f3', '#a8aff3', '#a0a9f3', '#98a2f2', '#8f9cf1', '#7a9cdc']
     ]
 
-// set up of 'screen' resolution, the size of our <canvas>
-const x_resolution = 640;
-const y_resolution = 480;
-
-// set up the size of our real and imaginary planes      
-const real_plane_minimum_value = -2.5;
-const real_plane_maximum_value = 0.8;
-const imaginary_plan_minimum_value = -1.25;
-const imaginary_plan_maximum_value = 1.25;
-
-// calculate the proportion in the difference between the points
-// on the mathematical plane and the actual screen resolution	
-const x_prop = (real_plane_maximum_value - real_plane_minimum_value) / (x_resolution - 1);
-const y_prop = (imaginary_plan_maximum_value - imaginary_plan_minimum_value) / (y_resolution - 1);
-
-const threshold = 10000.00; // threashold above which value is considered to tend to infinity
-// the coloured bands on the outside of our Mandelbrot Set are
-// a measure of how soon the values become unstable and hence the
-// point on the plane is not within the set itself, not bounded by the set
+const x_resolution = document.getElementById("mset_canvas").clientWidth;
+const y_resolution = document.getElementById("mset_canvas").clientHeight;
 
 function mandelbrot() {
     draw(document.getElementById("mset_canvas"), draw_mandelbrot)
 }
+
 function julia() {
     draw(document.getElementById("jset_canvas"), draw_julia)
 }
+
 function draw(canvas, set_drawing_func) {
     const ctx = canvas.getContext("2d");
     const max_iters = document.getElementById('iterations').value;
@@ -94,15 +79,24 @@ function set_colour_lsm(iter, max_iters, ctx) {
     }
 }
 
-// draw the Mandelbrot Set
 function draw_mandelbrot(ctx, max_iters, set_colour_func) {
+    const x_min = -2.5;
+    const x_max = 0.8;
+    const y_min = -1.25;
+    const y_max = 1.25;
+
+    // calculate the proportion in the difference between the points
+    // on the mathematical plane and the actual canvas size
+    const x_prop = (x_max - x_min) / (x_resolution - 1);
+    const y_prop = (y_max - y_min) / (y_resolution - 1);
+
     for (let iy = 0; iy < y_resolution; iy++) {
-        const cy = imaginary_plan_minimum_value + iy * y_prop;
+        const cy = y_min + iy * y_prop;
 
         for (let ix = 0; ix < x_resolution; ix++) {
-            const cx = real_plane_minimum_value + ix * x_prop;
+            const cx = x_min + ix * x_prop;
             const point = {x: 0.0, y: 0.0};
-            const iter = compute_point(point, cx, cy, max_iters, threshold);
+            const iter = compute_point(point, cx, cy, max_iters);
 
             set_colour_func(iter, max_iters, ctx, point);
             ctx.fillRect(ix, iy, 1, 1);
@@ -110,13 +104,14 @@ function draw_mandelbrot(ctx, max_iters, set_colour_func) {
     }
 }
 
-// draw a Julia set
 function draw_julia(ctx, max_iters, set_colour_func) {
     const x_min = -2.25;
     const x_max = 2.25;
     const y_min = -1.8;
     const y_max = 1.8;
 
+    // calculate the proportion in the difference between the points
+    // on the mathematical plane and the actual canvas size
     const x_prop = (x_max - x_min) / (x_resolution - 1);
     const y_prop = (y_max - y_min) / (y_resolution - 1);
 
@@ -128,7 +123,7 @@ function draw_julia(ctx, max_iters, set_colour_func) {
 
         for (let ix = 0; ix < x_resolution; ix++) {
             const point = {x: x_min + ix * x_prop, y: y};
-            const iter = compute_point(point, cx, cy, max_iters, threshold);
+            const iter = compute_point(point, cx, cy, max_iters);
 
             set_colour_func(iter, max_iters, ctx, point)
             ctx.fillRect(ix, iy, 1, 1);
@@ -136,12 +131,13 @@ function draw_julia(ctx, max_iters, set_colour_func) {
     }
 }
 
-function compute_point(point, cx, cy, maxiter, thresh) {
+function compute_point(point, cx, cy, max_iters) {
     let x2 = point.x * point.x;
     let y2 = point.y * point.y;
     let iter = 0;
+    const threshold = 10000.00; // threshold above which value is considered to tend to infinity
 
-    while ((iter < maxiter) && ((x2 + y2) < thresh)) {
+    while ((iter < max_iters) && ((x2 + y2) < threshold)) {
         let temp = x2 - y2 + cx;
         point.y = 2 * point.x * point.y + cy;
         point.x = temp;
@@ -152,12 +148,22 @@ function compute_point(point, cx, cy, maxiter, thresh) {
     return iter;
 }
 
-function set_coords(evt, obj) {
+function set_jset_coords(evt, obj) {
     const x_pos = evt.clientX - obj.offsetLeft;
     const y_pos = evt.clientY - obj.offsetTop;
 
-    const cx = real_plane_minimum_value + x_pos * x_prop;
-    const cy = imaginary_plan_minimum_value + y_pos * y_prop;
+    const x_min = -2.5;
+    const x_max = 0.8;
+    const y_min = -1.25;
+    const y_max = 1.25;
+
+    // calculate the proportion in the difference between the points
+    // on the mathematical plane and the actual canvas size
+    const x_prop = (x_max - x_min) / (x_resolution - 1);
+    const y_prop = (y_max - y_min) / (y_resolution - 1);
+
+    const cx = x_min + x_pos * x_prop;
+    const cy = y_min + y_pos * y_prop;
 
     document.getElementById('cx').value = cx;
     document.getElementById('cy').value = cy;
