@@ -8,7 +8,7 @@
 //
 
 // set up colour palettes for colouring the levels outside the set itself
-const colour_palettes =
+const colourPalettes =
     [
         ['#00429d', '#1448a0', '#204fa3', '#2955a6', '#315ca9', '#3862ac', '#3f69af', '#466fb2', '#4c76b5', '#527db7', '#5884ba', '#5e8abd', '#6491c0', '#6a98c2', '#709fc5', '#76a6c8', '#7cadca', '#83b4cd', '#89bbcf', '#90c2d2', '#97c9d4', '#9fd0d6', '#a7d6d8', '#afddda', '#b8e4dc', '#c2eade', '#ccf1e0', '#d9f7e1', '#e8fce1', '#ffffe0'],
         ['#94003a', '#98163e', '#9c2341', '#a12e45', '#a53849', '#a9414d', '#ae4951', '#b25155', '#b65959', '#ba615e', '#be6962', '#c27167', '#c6796b', '#ca8070', '#cd8874', '#d19079', '#d5977e', '#d99f83', '#dca689', '#e0ae8e', '#e3b694', '#e7bd9a', '#eac5a0', '#edcda6', '#f1d4ad', '#f4dcb4', '#f7e4bc', '#faebc5', '#fdf3cf', '#fffadf'],
@@ -19,49 +19,49 @@ const colour_palettes =
         ['#007ca6', '#0986ac', '#198fb2', '#2999b8', '#39a3bf', '#48acc5', '#59b5cb', '#69bed1', '#7ac7d7', '#8ccfdc', '#9ed8e2', '#b0e0e8', '#c3e8ee', '#d7f0f4', '#ebf8f9', '#e8f7ea', '#e3f0eb', '#dde8ed', '#d7e1ee', '#d1daef', '#cbd3f0', '#c4cbf1', '#bdc4f2', '#b7bdf2', '#afb6f3', '#a8aff3', '#a0a9f3', '#98a2f2', '#8f9cf1', '#7a9cdc']
     ]
 
-const x_resolution = document.getElementById("mset_canvas").clientWidth;
-const y_resolution = document.getElementById("mset_canvas").clientHeight;
+const xResolution = document.getElementById("mset_canvas").clientWidth;
+const yResolution = document.getElementById("mset_canvas").clientHeight;
 
 function init() {
-    document.getElementById("palette").setAttribute("max", colour_palettes.length.toString())
+    document.getElementById("palette").setAttribute("max", colourPalettes.length.toString())
 }
 
-function select_method() {
+function selectMethod() {
     if (document.getElementById('method').value === 'lsm') {
-        document.getElementById("palette_chooser").style.display='inline'
+        document.getElementById("palette_chooser").style.display = 'inline'
     } else {
-        document.getElementById("palette_chooser").style.display='none'
+        document.getElementById("palette_chooser").style.display = 'none'
     }
 }
 
 function mandelbrot() {
-    draw(document.getElementById("mset_canvas"), draw_mandelbrot)
+    drawSet(document.getElementById("mset_canvas"), drawMandelbrotSet)
 }
 
 function julia() {
-    draw(document.getElementById("jset_canvas"), draw_julia)
+    drawSet(document.getElementById("jset_canvas"), drawJuliaSet)
 }
 
-function draw(canvas, set_drawing_func) {
+function drawSet(canvas, setDrawingFunc) {
     const ctx = canvas.getContext("2d");
     const max_iters = document.getElementById('iterations').value;
     const method = document.getElementById('method').value;
 
-    set_drawing_func(ctx, max_iters, get_colouring_function(method))
+    setDrawingFunc(ctx, max_iters, getColouringFunctionForMethod(method))
 }
 
-function get_colouring_function(method) {
+function getColouringFunctionForMethod(method) {
     switch (method) {
         case 'bdm':
-            return set_colour_bdm
+            return setColourUsingBinaryDecompositionMethod
         case 'lsm':
         default:
-            return set_colour_lsm
+            return setColourUsingLevelSetMethod
     }
 }
 
-function set_colour_bdm(iter, maxiter, ctx, point) {
-    if (iter == maxiter) {
+function setColourUsingBinaryDecompositionMethod(iterations, maxIterations, ctx, point) {
+    if (iterations == maxIterations) {
         // if we didn't get to infinity by the time we
         // used up all the iterations, then we're in the set
         // colour it bloack
@@ -77,8 +77,8 @@ function set_colour_bdm(iter, maxiter, ctx, point) {
     }
 }
 
-function set_colour_lsm(iter, max_iters, ctx) {
-    if (iter == max_iters) {
+function setColourUsingLevelSetMethod(iterations, maxIterations, ctx) {
+    if (iterations == maxIterations) {
         // if we didn't get to infinity by the time we
         // used up all the iterations, then we're in the set
         // colour it bloack
@@ -86,81 +86,81 @@ function set_colour_lsm(iter, max_iters, ctx) {
     } else {
         // otherwise colour it according to the number
         // of iterations it took to get to infinity (threshold)
-        const palette_num = document.getElementById('palette').value;
-        ctx.fillStyle = colour_palettes[palette_num][iter % colour_palettes[palette_num].length];
+        const paletteNumber = document.getElementById('palette').value;
+        ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length];
     }
 }
 
-function draw_mandelbrot(ctx, max_iters, set_colour_func) {
+function drawMandelbrotSet(ctx, maxIterations, pointColouringFunc) {
     const x_min = -2.5;
     const x_max = 0.8;
     const y_min = -1.25;
     const y_max = 1.25;
 
-    // calculate the proportion in the difference between the points
-    // on the mathematical plane and the actual canvas size
-    const x_prop = (x_max - x_min) / (x_resolution - 1);
-    const y_prop = (y_max - y_min) / (y_resolution - 1);
+    const scalingFactor = getScalingFactors(x_max, x_min, y_max, y_min);
 
-    for (let iy = 0; iy < y_resolution; iy++) {
-        const cy = y_min + iy * y_prop;
+    for (let iy = 0; iy < yResolution; iy++) {
+        const cy = y_min + iy * scalingFactor.y;
 
-        for (let ix = 0; ix < x_resolution; ix++) {
-            const cx = x_min + ix * x_prop;
-            const point = {x: 0.0, y: 0.0};
-            const iter = compute_point(point, cx, cy, max_iters);
+        for (let ix = 0; ix < xResolution; ix++) {
+            const cx = x_min + ix * scalingFactor.x;
+            const currentPoint = {x: 0.0, y: 0.0};
+            const iterations = computePoint(currentPoint, cx, cy, maxIterations);
 
-            set_colour_func(iter, max_iters, ctx, point);
+            pointColouringFunc(iterations, maxIterations, ctx, currentPoint);
             ctx.fillRect(ix, iy, 1, 1);
         }
     }
 }
 
-function draw_julia(ctx, max_iters, set_colour_func) {
+function getScalingFactors(x_max, x_min, y_max, y_min) {
+    // calculate the proportion in the difference between the points
+    // on the mathematical plane and the actual canvas size
+    return {x: (x_max - x_min) / (xResolution - 1), y: (y_max - y_min) / (yResolution - 1)}
+}
+
+function drawJuliaSet(ctx, maxiumumIterations, pointColouringFunc) {
     const x_min = -2.25;
     const x_max = 2.25;
     const y_min = -1.8;
     const y_max = 1.8;
 
-    // calculate the proportion in the difference between the points
-    // on the mathematical plane and the actual canvas size
-    const x_prop = (x_max - x_min) / (x_resolution - 1);
-    const y_prop = (y_max - y_min) / (y_resolution - 1);
+    const scalingFactor = getScalingFactors(x_max, x_min, y_max, y_min);
 
     const cx = Number(document.getElementById('cx').value);
     const cy = Number(document.getElementById('cy').value);
 
-    for (let iy = 0; iy < y_resolution; iy++) {
-        const y = y_min + iy * y_prop;
+    for (let iy = 0; iy < yResolution; iy++) {
+        const y = y_min + iy * scalingFactor.y;
 
-        for (let ix = 0; ix < x_resolution; ix++) {
-            const point = {x: x_min + ix * x_prop, y: y};
-            const iter = compute_point(point, cx, cy, max_iters);
+        for (let ix = 0; ix < xResolution; ix++) {
+            const currentPoint = {x: x_min + ix * scalingFactor.x, y: y};
+            const iterations = computePoint(currentPoint, cx, cy, maxiumumIterations);
 
-            set_colour_func(iter, max_iters, ctx, point)
+            pointColouringFunc(iterations, maxiumumIterations, ctx, currentPoint)
             ctx.fillRect(ix, iy, 1, 1);
         }
     }
 }
 
-function compute_point(point, cx, cy, max_iters) {
-    let x2 = point.x * point.x;
-    let y2 = point.y * point.y;
-    let iter = 0;
+function computePoint(point, cx, cy, maximumIterations) {
     const threshold = 10000.00; // threshold above which value is considered to tend to infinity
 
-    while ((iter < max_iters) && ((x2 + y2) < threshold)) {
+    let x2 = point.x * point.x;
+    let y2 = point.y * point.y;
+    let iterations = 0;
+    while ((iterations < maximumIterations) && ((x2 + y2) < threshold)) {
         let temp = x2 - y2 + cx;
         point.y = 2 * point.x * point.y + cy;
         point.x = temp;
         x2 = point.x * point.x;
         y2 = point.y * point.y;
-        iter++;
+        iterations++;
     }
-    return iter;
+    return iterations;
 }
 
-function set_jset_coords(evt, obj) {
+function setJuliaSetCoordinates(evt, obj) {
     const x_pos = evt.clientX - obj.offsetLeft;
     const y_pos = evt.clientY - obj.offsetTop;
 
@@ -169,23 +169,19 @@ function set_jset_coords(evt, obj) {
     const y_min = -1.25;
     const y_max = 1.25;
 
-    // calculate the proportion in the difference between the points
-    // on the mathematical plane and the actual canvas size
-    const x_prop = (x_max - x_min) / (x_resolution - 1);
-    const y_prop = (y_max - y_min) / (y_resolution - 1);
+    let scalingFactors = getScalingFactors(x_max, x_min, y_max, y_min);
 
-    const cx = x_min + x_pos * x_prop;
-    const cy = y_min + y_pos * y_prop;
+    const cx = x_min + x_pos * scalingFactors.x;
+    const cy = y_min + y_pos * scalingFactors.y;
 
     document.getElementById('cx').value = cx;
     document.getElementById('cy').value = cy;
 }
 
-function key_command_processor(e) {
-    const evtobj = window.event ? event : e; //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
-    const unicode = evtobj.charCode ? evtobj.charCode : evtobj.keyCode;
-    const actualkey = String.fromCharCode(unicode);
-    switch (actualkey) {
+function keyCommandProcessor(e) {
+    const eventObject = window.event ? event : e; //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
+    const actualKey = String.fromCharCode(eventObject.charCode ? eventObject.charCode : eventObject.keyCode);
+    switch (actualKey) {
         case 'z':
             alert("zoom mode - coming soon");
             break;
