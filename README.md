@@ -2,7 +2,9 @@
 
 ![Mandelbrot's Baby](mset.png)
 
-Been playing a bit with HTML 5 and the ''canvas'' tag.  Using some JavaScript wizardry it's possible to have an interactive Mandelbrot and Julia set explorer, with no other code.  All that's left is to add a zoom function :P
+Using some JavaScript wizardry it's possible to have an interactive Mandelbrot and Julia set explorer, with no other code.  Clicking the mouse at any point in the Mandelbrot set will draw the corresponding Julia set.  Setting the Auto-draw Julia Set option to On and moving the mouse over the Mandelbrot set will provide an interactive Julia-set journey.
+
+There is a Zoom function, enabled by hitting the Z key over the Mset canvas.  To zoom in click the left mouse button, to zoom out, click the right.  When you're happy with the zoom window hit enter to redraw.
 
 [Take a look at the Mandelbrot and Julia set generator using HTML 5 canvas element in action](https://mbharris.co.uk/fractals/mandlebrot-set-and-julia-set-explorer-in-html5.html).
 

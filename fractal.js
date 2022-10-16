@@ -1,9 +1,9 @@
 //
 // JavaScript methods to draw Mandelbrot and Julia Sets
 //
-// version 1.3 - featuring LSM and BDM methods, iterations slider, colour palettes, and auto draw julia set mode
+// version 1.4 - featuring LSM and BDM methods, iterations slider, colour palettes, auto draw julia set mode, and zoom mode
 //
-// (c) 2009-2015 Mike Harris.  
+// (c) 2009-2022 Mike Harris; (c) 1987-1990 Mike Harris & Dan Grace
 // Free software released under GNU Public Licence v2.0.
 //
 
@@ -30,8 +30,49 @@ const yResolution = document.getElementById("mset_canvas").clientHeight;
 const defaultMsetPlane = {x_min: -2.5, y_min: -1.25, x_max: 0.8, y_max: 1.25};
 const defaultJsetPlane = {x_min: -2.25, y_min: -1.8, x_max: 2.25, y_max: 1.8};
 
+const ZOOM_MODE = 'zoom';
+const EXPLORE_MODE = 'explore';
+let mode = EXPLORE_MODE
+
+class FractalChunk {
+    constructor(imageData, x, y, w, h) {
+        this.imageData = imageData
+        this.x = x
+        this.y = y
+        this.w = w
+        this.h = h
+    }
+}
+
+let canvasBeforeZoomBox = null
+
 function init() {
-    document.getElementById("palette").setAttribute("max", colourPalettes.length.toString())
+    document.getElementById("palette").setAttribute("max", (colourPalettes.length - 1).toString())
+    setMsetWindowTo(defaultMsetPlane);
+    setZoomWindowTo(160, 120, 320, 240)
+}
+
+function setMsetWindowTo(plane) {
+    document.getElementById("x_min").value = plane.x_min
+    document.getElementById("y_min").value = plane.y_min
+    document.getElementById("x_max").value = plane.x_max
+    document.getElementById("y_max").value = plane.y_max
+}
+
+function setZoomWindowTo(x, y, w, h) {
+    document.getElementById("zoom_x").value = x
+    document.getElementById("zoom_y").value = y
+    document.getElementById("zoom_w").value = w
+    document.getElementById("zoom_h").value = h
+}
+
+function getCurrentZoomWindow() {
+    return {
+        x: parseFloat(document.getElementById("zoom_x").value),
+        y: parseFloat(document.getElementById("zoom_y").value),
+        w: parseFloat(document.getElementById("zoom_w").value),
+        h: parseFloat(document.getElementById("zoom_h").value)
+    }
 }
 
 function selectMethod() {
@@ -42,21 +83,31 @@ function selectMethod() {
     }
 }
 
-function mandelbrot() {
-    drawSet(document.getElementById("mset_canvas"), drawMandelbrotSet, defaultMsetPlane)
+function getCurrentPlane() {
+    return {
+        x_min: parseFloat(document.getElementById("x_min").value),
+        y_min: parseFloat(document.getElementById("y_min").value),
+        x_max: parseFloat(document.getElementById("x_max").value),
+        y_max: parseFloat(document.getElementById("y_max").value)
+    };
+}
 
+function mandelbrot() {
+    let currentPlane = getCurrentPlane()
+    drawSet(document.getElementById("mset_canvas"), mandelbrotDrawingFunc, currentPlane)
 }
 
 function julia() {
-    drawSet(document.getElementById("jset_canvas"), drawJuliaSet, defaultJsetPlane)
+    drawSet(document.getElementById("jset_canvas"), juliaDrawingFunc, defaultJsetPlane)
 }
 
-function drawSet(canvas, setDrawingFunc, plane) {
+function drawSet(canvas, drawingFunc, plane) {
     const ctx = canvas.getContext("2d");
+    ctx.reset()
     const max_iters = document.getElementById('iterations').value;
     const method = document.getElementById('method').value;
 
-    setDrawingFunc(ctx, max_iters, getColouringFunctionForMethod(method), plane)
+    drawingFunc(ctx, max_iters, getColouringFunctionForMethod(method), plane)
 }
 
 function getColouringFunctionForMethod(method) {
@@ -100,7 +151,7 @@ function setColourUsingLevelSetMethod(iterations, maxIterations, ctx) {
     }
 }
 
-function drawMandelbrotSet(ctx, maxIterations, pointColouringFunc, plane) {
+function mandelbrotDrawingFunc(ctx, maxIterations, pointColouringFunc, plane) {
     const scalingFactor = getScalingFactors(plane);
 
     for (let iy = 0; iy < yResolution; iy++) {
@@ -123,7 +174,7 @@ function getScalingFactors(plane) {
     return {x: (plane.x_max - plane.x_min) / (xResolution - 1), y: (plane.y_max - plane.y_min) / (yResolution - 1)}
 }
 
-function drawJuliaSet(ctx, maxIterations, pointColouringFunc, plane) {
+function juliaDrawingFunc(ctx, maxIterations, pointColouringFunc, plane) {
     const scalingFactor = getScalingFactors(plane);
 
     const cx = Number(document.getElementById('cx').value);
@@ -162,25 +213,137 @@ function computePoint(point, cx, cy, maxIterations) {
 function setJuliaSetCoordinates(evt, obj) {
     const x_pos = evt.clientX - obj.offsetLeft;
     const y_pos = evt.clientY - obj.offsetTop;
-
-    let scalingFactors = getScalingFactors(defaultMsetPlane);
-
-    const cx = defaultMsetPlane.x_min + x_pos * scalingFactors.x;
-    const cy = defaultMsetPlane.y_min + y_pos * scalingFactors.y;
+    const currentPlane = getCurrentPlane();
+    const scalingFactors = getScalingFactors(currentPlane);
+    const cx = currentPlane.x_min + x_pos * scalingFactors.x;
+    const cy = currentPlane.y_min + y_pos * scalingFactors.y;
 
     document.getElementById('cx').value = cx;
     document.getElementById('cy').value = cy;
 }
 
+function zoomToNewWindow(ctx, canvas) {
+    const {x, y, w, h} = getCurrentZoomWindow();
+    const currentPlane = getCurrentPlane();
+    const scalingFactors = getScalingFactors(currentPlane);
+    const zoomedPlane = {
+        x_min: currentPlane.x_min + x * scalingFactors.x,
+        y_min: currentPlane.y_min + y * scalingFactors.y,
+        x_max: currentPlane.x_min + (x + w) * scalingFactors.x,
+        y_max: currentPlane.y_min + (y + h) * scalingFactors.y
+    };
+
+    setMsetWindowTo(zoomedPlane)
+    ctx.reset()
+    drawSet(canvas, mandelbrotDrawingFunc, zoomedPlane)
+    mode = EXPLORE_MODE
+}
+
 function keyCommandProcessor(e) {
     const eventObject = window.event ? event : e; //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
-    const actualKey = String.fromCharCode(eventObject.charCode ? eventObject.charCode : eventObject.keyCode);
-    switch (actualKey) {
-        case 'z':
-            alert("zoom mode - coming soon");
+    const keyCode = eventObject.charCode ? eventObject.charCode : eventObject.keyCode;
+    const Z_KEY_CODE = 90;
+    const C_KEY_CODE = 67;
+    const ENTER_KEY_CODE = 13;
+    let canvas = document.getElementById("mset_canvas");
+    let ctx = canvas.getContext("2d");
+    switch (keyCode) {
+        case Z_KEY_CODE:
+            if (mode !== ZOOM_MODE) {
+                mode = ZOOM_MODE
+                drawZoomBox(ctx, getCurrentZoomWindow())
+            } else {
+                ctx.reset()
+                mandelbrot()
+                mode = EXPLORE_MODE
+            }
             break;
-        case 'c':
+        case C_KEY_CODE:
             alert("colour cycling mode - coming soon");
             break;
+        case ENTER_KEY_CODE:
+            if (mode === ZOOM_MODE) {
+                zoomToNewWindow(ctx, canvas)
+            }
+            break;
+        default:
+            console.log("key code is " + keyCode)
     }
+}
+
+function drawJuliaSetForCurrentC(event, obj) {
+    setJuliaSetCoordinates(event, obj);
+    julia(event, obj);
+}
+
+function handleMsetMouseMove(event, obj) {
+    function moveZoomBox() {
+        const {x, y, w, h} = getCurrentZoomWindow()
+        let ctx = document.getElementById("mset_canvas").getContext("2d");
+        if (canvasBeforeZoomBox != null) {
+            ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
+        }
+        const x_pos = event.clientX - obj.offsetLeft;
+        const y_pos = event.clientY - obj.offsetTop;
+        drawZoomBox(ctx, {x: x_pos, y: y_pos, w: w, h: h})
+    }
+
+    switch (mode) {
+        case ZOOM_MODE:
+            moveZoomBox()
+            break;
+        default:
+            if (document.getElementById('autodraw').value === 'on') {
+                drawJuliaSetForCurrentC(event, obj);
+            }
+    }
+}
+
+function handleMsetMouseClick(event, obj) {
+    function zoomIn() {
+        let ctx = document.getElementById("mset_canvas").getContext("2d")
+        if (canvasBeforeZoomBox != null) {
+            ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
+        }
+        const {x, y, w, h} = getCurrentZoomWindow()
+        setZoomWindowTo(x, y, Math.round(w * 0.9), Math.round(h * 0.9))
+        drawZoomBox(ctx, getCurrentZoomWindow())
+    }
+
+    function zoomOut() {
+        let ctx = document.getElementById("mset_canvas").getContext("2d")
+        if (canvasBeforeZoomBox != null) {
+            ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
+        }
+        const {x, y, w, h} = getCurrentZoomWindow()
+        setZoomWindowTo(x, y, Math.round(w * 1.5), Math.round(h * 1.5))
+        drawZoomBox(ctx, getCurrentZoomWindow())
+    }
+
+    switch (mode) {
+        case ZOOM_MODE:
+            switch (event.button) {
+                case 0:
+                    zoomIn()
+                    break
+                case 2:
+                    zoomOut()
+                    break
+            }
+            break
+        default:
+            drawJuliaSetForCurrentC(event, obj)
+    }
+}
+
+function drawZoomBox(ctx, dimensions) {
+    canvasBeforeZoomBox = new FractalChunk(
+        ctx.getImageData(dimensions.x, dimensions.y, dimensions.w, dimensions.h),
+        dimensions.x, dimensions.y, dimensions.w, dimensions.h)
+
+    ctx.beginPath()
+    ctx.fillStyle = "#FFFFFF"
+    ctx.globalAlpha = 0.5
+    ctx.fillRect(dimensions.x, dimensions.y, dimensions.w, dimensions.h)
+    setZoomWindowTo(dimensions.x, dimensions.y, dimensions.w, dimensions.h)
 }

@@ -20,7 +20,7 @@
         }
     </style>
 </head>
-<body onload="init(); mandelbrot(); julia()" onkeypress=keyCommandProcessor()>
+<body onload="init(); mandelbrot(); julia()" onkeydown=keyCommandProcessor()>
 <h1>Mandelbrot Set &gt; Julia Set Explorer using HTML 5 Canvas element and JavaScript</h1>
 <h2>written by <a href="http://mbharris.co.uk">Mike Harris</a>, based on algorithms in The Science of Fractal Images. <a
         href="https://github.com/mikebharris/canvas_mandelbrot_explorer">Fork this at GitHub</a></h2>
@@ -37,7 +37,7 @@
                                                                             max="" min="0" value="0"
                                                                             onchange="mandelbrot(); julia()"/></span>
     Iterations:
-    <input id="iterations" type="range" min="30" max="1000" value="100" step="5"
+    <input id="iterations" type="range" min="30" max="5000" value="100" step="5"
            onchange="document.getElementById('num_iters').innerHTML = this.value"/>
     (<span id="num_iters">100</span>)
     <button onclick="mandelbrot();">Redraw MSet</button>
@@ -47,15 +47,30 @@
     </select>
 <p>
     <canvas id="mset_canvas" width="640" height="480" style="float:left"
-            onmousemove="if (document.getElementById('autodraw').value == 'on') { setJuliaSetCoordinates(event,this);julia(event,this);}"
-            onclick="setJuliaSetCoordinates(event,this);julia(event,this);"></canvas>&nbsp;
+            onmousemove="handleMsetMouseMove(event, this)"
+            onclick="handleMsetMouseClick(event, this)"
+            onmousedown="handleMsetMouseClick(event, this)"
+            oncontextmenu="event.preventDefault()"
+    ></canvas>&nbsp;
     <canvas id="jset_canvas" width="640" height="480"></canvas>
 </p>
 <p>
     cx: <input type="text" value="" name="cx" id="cx" value="0.0"/>
-    cy: <input type="text" value="" name="cy" id="cy" value="0.0"/>&nbsp;<button onclick="julia(event,this)">redraw
-    julia set
-</button>
+    cy: <input type="text" value="" name="cy" id="cy" value="0.0"/>&nbsp;
+    <button onclick="julia(event,this)">redraw julia set</button>
+</p>
+<p>
+    mset: x_min = <input type="text" value="" name="x_min" id="x_min" />
+    y_min = <input type="text" value="" name="x_min" id="y_min" />
+    x_max = <input type="text" value="" name="x_max" id="x_max" />
+    y_max = <input type="text" value="" name="y_max" id="y_max" />
+    <button onclick="init();mandelbrot()">Reset</button>
+</p>
+<p>
+    zoom: zoom_x = <input type="text" value="" name="zoom_x" id="zoom_x" />
+    zoom_y = <input type="text" value="" name="zoom_y" id="zoom_y" />
+    zoom_w = <input type="text" value="" name="zoom_w" id="zoom_w" />
+    zoom_h = <input type="text" value="" name="zoom_h" id="zoom_h" />
 </p>
 <p>There's also an archive of old Fractal work I did with Dan Grace back in the Eighties on the <a
         href="http://mbharris.co.uk/mandlebrot-set-and-julia-set-generator-for-atari-st/">Fractal Engine archive
