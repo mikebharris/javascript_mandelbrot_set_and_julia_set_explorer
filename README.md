@@ -1,7 +1,7 @@
 # JavaScript Mandelbrot and Julia Set Explorer
 
 ![Mandelbrot's Baby](mset.png)
-(<img width="1289" alt="image" src="https://user-images.githubusercontent.com/60698096/196234582-b16f8318-751a-415b-93cb-b8b6a8670934.png">
+![Close-up in green](closeup1.png)
 
 Using some JavaScript wizardry it's possible to have an interactive Mandelbrot and Julia set explorer, with no other code.  Clicking the mouse at any point in the Mandelbrot set will draw the corresponding Julia set.  Setting the Auto-draw Julia Set option to On and moving the mouse over the Mandelbrot set will provide an interactive Julia-set journey.
 
