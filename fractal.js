@@ -34,7 +34,7 @@ const ZOOM_MODE = 'zoom';
 const EXPLORE_MODE = 'explore';
 let mode = EXPLORE_MODE
 
-class FractalChunk {
+class CanvasRectangleSnapshot {
     constructor(imageData, x, y, w, h) {
         this.imageData = imageData
         this.x = x
@@ -337,7 +337,7 @@ function handleMsetMouseClick(event, obj) {
 }
 
 function drawZoomBox(ctx, dimensions) {
-    canvasBeforeZoomBox = new FractalChunk(
+    canvasBeforeZoomBox = new CanvasRectangleSnapshot(
         ctx.getImageData(dimensions.x, dimensions.y, dimensions.w, dimensions.h),
         dimensions.x, dimensions.y, dimensions.w, dimensions.h)
 
