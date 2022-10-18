@@ -243,7 +243,6 @@ function keyCommandProcessor(e) {
     const eventObject = window.event ? event : e; //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
     const keyCode = eventObject.charCode ? eventObject.charCode : eventObject.keyCode;
     const Z_KEY_CODE = 90;
-    const C_KEY_CODE = 67;
     const ENTER_KEY_CODE = 13;
     let canvas = document.getElementById("mset_canvas");
     let ctx = canvas.getContext("2d");
@@ -257,9 +256,6 @@ function keyCommandProcessor(e) {
                 mandelbrot()
                 mode = EXPLORE_MODE
             }
-            break;
-        case C_KEY_CODE:
-            alert("colour cycling mode - coming soon");
             break;
         case ENTER_KEY_CODE:
             if (mode === ZOOM_MODE) {
