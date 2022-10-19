@@ -1,7 +1,7 @@
 //
 // JavaScript methods to draw Mandelbrot and Julia Sets
 //
-// version 1.4 - featuring LSM and BDM methods, iterations slider, colour palettes, auto draw julia set mode, and zoom mode
+// version 1.5 - featuring LSM, DEM and BDM methods, iterations slider, colour palettes, auto draw julia set mode, and zoom mode
 //
 // (c) 2009-2022 Mike Harris; (c) 1987-1990 Mike Harris & Dan Grace
 // Free software released under GNU Public Licence v2.0.
@@ -282,9 +282,9 @@ function computePoint(point, cx, cy, maxIterations) {
     return iterations;
 }
 
-function setJuliaSetCoordinates(evt, obj) {
-    const x_pos = evt.clientX - obj.offsetLeft;
-    const y_pos = evt.clientY - obj.offsetTop;
+function setJuliaSetCoordinates(evt, canvas) {
+    const x_pos = evt.clientX - canvas.offsetLeft;
+    const y_pos = evt.clientY - canvas.offsetTop;
     const currentPlane = getCurrentPlane();
     const scalingFactors = getScalingFactors(currentPlane);
     const cx = currentPlane.x_min + x_pos * scalingFactors.x;
@@ -311,12 +311,11 @@ function zoomToNewWindow(ctx, canvas) {
     mode = EXPLORE_MODE
 }
 
-function keyCommandProcessor(e) {
+function keyCommandProcessor(e, canvas) {
     const eventObject = window.event ? event : e; //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
     const keyCode = eventObject.charCode ? eventObject.charCode : eventObject.keyCode;
     const Z_KEY_CODE = 90;
     const ENTER_KEY_CODE = 13;
-    let canvas = document.getElementById("mset_canvas");
     let ctx = canvas.getContext("2d");
     switch (keyCode) {
         case Z_KEY_CODE:
@@ -344,15 +343,15 @@ function drawJuliaSetForCurrentC(event, obj) {
     julia(event, obj);
 }
 
-function handleMsetMouseMove(event, obj) {
+function handleMsetMouseMove(event, canvas) {
     function moveZoomBox() {
         const {x, y, w, h} = getCurrentZoomWindow()
-        let ctx = document.getElementById("mset_canvas").getContext("2d");
+        let ctx = canvas.getContext("2d");
         if (canvasBeforeZoomBox != null) {
             ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
         }
-        const x_pos = event.clientX - obj.offsetLeft;
-        const y_pos = event.clientY - obj.offsetTop;
+        const x_pos = event.clientX - canvas.offsetLeft;
+        const y_pos = event.clientY - canvas.offsetTop;
         drawZoomBox(ctx, {x: x_pos, y: y_pos, w: w, h: h})
     }
 
@@ -362,14 +361,13 @@ function handleMsetMouseMove(event, obj) {
             break;
         default:
             if (document.getElementById('autodraw').value === 'on') {
-                drawJuliaSetForCurrentC(event, obj);
+                drawJuliaSetForCurrentC(event, canvas);
             }
     }
 }
 
-function handleMsetMouseClick(event, obj) {
-    function zoomIn() {
-        let ctx = document.getElementById("mset_canvas").getContext("2d")
+function handleMsetMouseClick(event, canvas) {
+    function zoomIn(ctx) {
         if (canvasBeforeZoomBox != null) {
             ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
         }
@@ -378,8 +376,7 @@ function handleMsetMouseClick(event, obj) {
         drawZoomBox(ctx, getCurrentZoomWindow())
     }
 
-    function zoomOut() {
-        let ctx = document.getElementById("mset_canvas").getContext("2d")
+    function zoomOut(ctx) {
         if (canvasBeforeZoomBox != null) {
             ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
         }
@@ -390,17 +387,18 @@ function handleMsetMouseClick(event, obj) {
 
     switch (mode) {
         case ZOOM_MODE:
+            let ctx = canvas.getContext("2d")
             switch (event.button) {
                 case 0:
-                    zoomIn()
+                    zoomIn(ctx)
                     break
                 case 2:
-                    zoomOut()
+                    zoomOut(ctx)
                     break
             }
             break
         default:
-            drawJuliaSetForCurrentC(event, obj)
+            drawJuliaSetForCurrentC(event, canvas)
     }
 }
 
