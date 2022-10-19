@@ -32,6 +32,7 @@
 <p>Colouring method:
     <select id="method" name="method" onchange="selectMethod(); mandelbrot(); julia()">
         <option value="lsm" selected="selected">Level Set Method (LSM)</option>
+        <option value="dem">Distance Estimator Method (DEM)</option>
         <option value="bdm">Binary Decomposition Method (BDM)</option>
     </select>
     <span id="palette_chooser"><label for="palette">Palette</label>: <input type="number" id="palette" name="palette"

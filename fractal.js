@@ -93,12 +93,19 @@ function getCurrentPlane() {
 }
 
 function mandelbrot() {
-    let currentPlane = getCurrentPlane()
-    drawSet(document.getElementById("mset_canvas"), mandelbrotDrawingFunc, currentPlane)
+    const canvas = document.getElementById("mset_canvas");
+    const currentPlane = getCurrentPlane()
+    switch(document.getElementById('method').value) {
+        case 'dem':
+            mandelbrotDrawingFuncDem(canvas.getContext("2d"), document.getElementById('iterations').value, currentPlane)
+            break
+        default:
+            drawSet(canvas, mandelbrotDrawingFuncLsm, currentPlane)
+    }
 }
 
 function julia() {
-    drawSet(document.getElementById("jset_canvas"), juliaDrawingFunc, defaultJsetPlane)
+    drawSet(document.getElementById("jset_canvas"), juliaDrawingFuncLsm, defaultJsetPlane)
 }
 
 function drawSet(canvas, drawingFunc, plane) {
@@ -151,7 +158,7 @@ function setColourUsingLevelSetMethod(iterations, maxIterations, ctx) {
     }
 }
 
-function mandelbrotDrawingFunc(ctx, maxIterations, pointColouringFunc, plane) {
+function mandelbrotDrawingFuncLsm(ctx, maxIterations, pointColouringFunc, plane) {
     const scalingFactor = getScalingFactors(plane);
 
     for (let iy = 0; iy < yResolution; iy++) {
@@ -168,13 +175,73 @@ function mandelbrotDrawingFunc(ctx, maxIterations, pointColouringFunc, plane) {
     }
 }
 
+function mandelbrotDrawingFuncDem(ctx, maxIterations, plane) {
+    const scalingFactor = getScalingFactors(plane);
+    const delta = 0.2 * scalingFactor.x
+    const paletteNumber = document.getElementById('palette').value
+
+    for (let iy = 0; iy < yResolution; iy++) {
+        const cy = plane.y_min + iy * scalingFactor.y;
+
+        for (let ix = 0; ix < xResolution; ix++) {
+            const cx = plane.x_min + ix * scalingFactor.x;
+            const currentPoint = {x: 0.0, y: 0.0};
+            const dist = computePointDem(currentPoint, cx, cy, maxIterations);
+            if (dist < delta) {
+                ctx.fillStyle = "#000000"
+            } else {
+                // ctx.fillStyle = "#ffffff"
+                ctx.fillStyle = colourPalettes[paletteNumber][parseInt(dist*100 % colourPalettes[paletteNumber].length)]
+            }
+            ctx.fillRect(ix, iy, 1, 1)
+        }
+    }
+}
+
+function computePointDem(point, cx, cy, maxIterations) {
+    const huge = 100000.0;
+    let x = point.x, y = point.y, x2 = 0.0, y2 = 0.0, dist = 0.0, xorbit = [], yorbit = []
+    xorbit[0] = 0.0
+    yorbit[0] = 0.0
+
+    let iterations = 0;
+    while ((iterations < maxIterations) && ((x2 + y2) < huge)) {
+        let temp = x2 - y2 + cx
+        y = 2 * x * y + cy
+        x = temp
+        x2 = x * x
+        y2 = y * y
+        iterations++;
+        xorbit[iterations] = x
+        yorbit[iterations] = y
+    }
+    const overflow = 100000000000;
+    if ((x2 + y2) > huge) {
+        let xder = 0.0, yder = 0.0
+        let i = 0
+        let flag = false
+        while ((i < iterations) && !flag) {
+            let temp = 2 * (xorbit[i] * xder - yorbit[i] * yder) + 1
+            yder = 2 * (yorbit[i] * xder + xorbit[i] * yder)
+            xder = temp
+            flag = Math.max(Math.abs(xder), Math.abs(yder)) > overflow
+            i++
+        }
+        if (!flag) {
+            dist = (Math.log(x2 + y2) * Math.sqrt(x2 + y2)) / Math.sqrt(xder * xder + yder * yder)
+        }
+    }
+
+    return dist
+}
+
 function getScalingFactors(plane) {
     // calculate the proportion in the difference between the points
     // on the mathematical plane and the actual canvas size
     return {x: (plane.x_max - plane.x_min) / (xResolution - 1), y: (plane.y_max - plane.y_min) / (yResolution - 1)}
 }
 
-function juliaDrawingFunc(ctx, maxIterations, pointColouringFunc, plane) {
+function juliaDrawingFuncLsm(ctx, maxIterations, pointColouringFunc, plane) {
     const scalingFactor = getScalingFactors(plane);
 
     const cx = Number(document.getElementById('cx').value);
@@ -235,7 +302,7 @@ function zoomToNewWindow(ctx, canvas) {
 
     setMsetWindowTo(zoomedPlane)
     ctx.reset()
-    drawSet(canvas, mandelbrotDrawingFunc, zoomedPlane)
+    mandelbrot()
     mode = EXPLORE_MODE
 }
 
