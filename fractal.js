@@ -81,10 +81,14 @@ function getCurrentZoomWindow() {
 }
 
 function selectMethod() {
-    if (document.getElementById('method').value === 'lsm') {
-        document.getElementById("palette_chooser").style.display = 'inline'
-    } else {
-        document.getElementById("palette_chooser").style.display = 'none'
+    const method = document.getElementById('method').value;
+    switch (method) {
+        case 'lsm':
+        case 'dem':
+            document.getElementById("palette_chooser").style.display = 'inline'
+            break
+        default:
+            document.getElementById("palette_chooser").style.display = 'none'
     }
 }
 
