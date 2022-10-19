@@ -28,7 +28,7 @@ const xResolution = document.getElementById("mset_canvas").clientWidth;
 const yResolution = document.getElementById("mset_canvas").clientHeight;
 
 const defaultMsetPlane = {x_min: -2.5, y_min: -1.25, x_max: 0.8, y_max: 1.25};
-const defaultJsetPlane = {x_min: -2.25, y_min: -1.8, x_max: 2.25, y_max: 1.8};
+const defaultJsetPlane = {x_min: -2.0, y_min: -1.5, x_max: 2.0, y_max: 1.5};
 
 const ZOOM_MODE = 'zoom';
 const EXPLORE_MODE = 'explore';
