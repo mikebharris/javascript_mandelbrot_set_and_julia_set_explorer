@@ -131,7 +131,7 @@ function setColourUsingBinaryDecompositionMethod(iterations, maxIterations, ctx,
     if (iterations == maxIterations) {
         // if we didn't get to infinity by the time we
         // used up all the iterations, then we're in the set
-        // colour it bloack
+        // colour it black
         ctx.fillStyle = "#000000";
     } else {
         // color it depending on the angle of alpha
@@ -237,7 +237,7 @@ function computePointDem(point, cx, cy, maxIterations) {
 
 function getScalingFactors(plane) {
     // calculate the proportion in the difference between the points
-    // on the mathematical plane and the actual canvas size
+    // on the mathematical plane and the actual canvas size (screen resolution)
     return {x: (plane.x_max - plane.x_min) / (xResolution - 1), y: (plane.y_max - plane.y_min) / (yResolution - 1)}
 }
 
