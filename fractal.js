@@ -1,7 +1,7 @@
 //
 // JavaScript methods to draw Mandelbrot and Julia Sets
 //
-// version 1.4 - featuring LSM and BDM methods, iterations slider, colour palettes, auto draw julia set mode, and zoom mode
+// version 1.5 - featuring LSM, DEM and BDM methods, iterations slider, colour palettes, auto draw julia set mode, and zoom mode
 //
 // (c) 2009-2022 Mike Harris; (c) 1987-1990 Mike Harris & Dan Grace
 // Free software released under GNU Public Licence v2.0.
