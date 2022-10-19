@@ -20,7 +20,7 @@
         }
     </style>
 </head>
-<body onload="init(); mandelbrot(); julia()">
+<body onload="init(); mandelbrot(); julia()" onkeydown=keyCommandProcessor()>
 <h1>Mandelbrot Set &amp; Julia Set Explorer using HTML 5 Canvas element and JavaScript</h1>
 <h2>written by <a href="http://mbharris.co.uk">Mike Harris</a>, based on algorithms in The Science of Fractal Images. <a
         href="https://github.com/mikebharris/canvas_mandelbrot_explorer">Fork this at GitHub</a></h2>
@@ -48,20 +48,13 @@
         <option value="on">Autodraw Julia Set Mode On</option>
     </select>
 <p>
-    <canvas tabindex="1" id="mset_canvas" width="640" height="480" style="float:left"
+    <canvas id="mset_canvas" width="640" height="480" style="float:left"
             onmousemove="handleMsetMouseMove(event, this)"
             onclick="handleMsetMouseClick(event, this)"
             onmousedown="handleMsetMouseClick(event, this)"
             oncontextmenu="event.preventDefault()"
-            onkeydown="keyCommandProcessor(event, this)"
     ></canvas>&nbsp;
-    <canvas tabindex="2" id="jset_canvas" width="640" height="480"
-            onmousemove="handleMsetMouseMove(event, this)"
-            onclick="handleMsetMouseClick(event, this)"
-            onmousedown="handleMsetMouseClick(event, this)"
-            oncontextmenu="event.preventDefault()"
-            onkeydown="keyCommandProcessor(event, this)"
-    ></canvas>
+    <canvas id="jset_canvas" width="640" height="480"></canvas>
 </p>
 <p>
     cx: <input type="text" value="" name="cx" id="cx" value="0.0"/>
