@@ -154,8 +154,9 @@ function setColourUsingBinaryDecompositionMethod(iterations, maxIterations, ctx,
         ctx.fillStyle = "#000"
     } else {
         // color it depending on the angle of alpha
-        const alpha = Math.atan(point.y)
-        if ((alpha >= 0) && (alpha <= 3)) {
+        // const alpha = Math.atan(Math.abs(point.y)) <- interesting with upper bound around 0.8
+        const alpha = Math.atan2(point.y, point.x)
+        if ((alpha >= 0) && (alpha < 2 * Math.PI)) {
             ctx.fillStyle = "#000"
         } else {
             ctx.fillStyle = "#fff"
