@@ -11,7 +11,7 @@
             font-size: 1.0em;
         }
 
-        p {
+        p, div {
             font-size: 0.8em;
         }
 
@@ -20,7 +20,7 @@
         }
     </style>
 </head>
-<body onload="init(); mandelbrot(); julia()" onkeydown=keyCommandProcessor()>
+<body onload="init(); mandelbrot(); julia()" onkeydown="keyCommandProcessor()">
 <h1>Mandelbrot Set &amp; Julia Set Explorer using HTML 5 Canvas element and JavaScript</h1>
 <h2>written by <a href="http://mbharris.co.uk">Mike Harris</a>, based on algorithms in The Science of Fractal Images. <a
         href="https://github.com/mikebharris/canvas_mandelbrot_explorer">Fork this at GitHub</a></h2>
@@ -28,8 +28,9 @@
     you turn <strong>Autodraw Julia Set Mode</strong> on then the Julia Set will draw automatically just by moving the
     mouse over the Mandelbrot Set. Feel free to play with the number of iterations. The higher the better the fidelity
     of the drawing, but the slower it is to draw.</p>
-<p>There is a Zoom function, enabled by hitting the Z key over the Mset canvas.  To zoom in click the left mouse button, to zoom out, click the right.  When you're happy with the zoom window hit enter to redraw.</p>
-<p>Colouring method:
+<p>There is a Zoom function, enabled by hitting the Z key over the Mset canvas. To zoom in click the left mouse button,
+    to zoom out, click the right. When you're happy with the zoom window hit enter to redraw.</p>
+<p><label for="method">Colouring method</label>:
     <select id="method" name="method" onchange="selectMethod(); mandelbrot(); julia()">
         <option value="lsm" selected="selected">Level Set Method (LSM)</option>
         <option value="dem">Distance Estimator Method (DEM)</option>
@@ -38,11 +39,16 @@
     <span id="palette_chooser"><label for="palette">Palette</label>: <input type="number" id="palette" name="palette"
                                                                             max="" min="0" value="0"
                                                                             onchange="mandelbrot(); julia()"/></span>
-    Iterations:
-    <input id="iterations" type="range" min="30" max="5000" value="100" step="5"
-           onchange="document.getElementById('num_iters').innerHTML = this.value"/>
-    (<span id="num_iters">100</span>)
+    <label for="iterations">Iterations</label>:
+    <input id="iterations" type="number" min="25" max="5000" value="100" step="25"/>
+    <span id="dem-parameters" style="display: none">
+        <label for="dem-threshold">threshold: </label>
+        <input id="dem-threshold" name="dem-threshold" value="0.2" type="number" step="0.01" min="0" max="3"/>&nbsp;
+        <label for="dem-overflow">overflow: </label>
+        <input id="dem-overflow" value="100000000000" type="number" step="100000000000" max="100000000000000" />
+    </span>
     <button onclick="mandelbrot();">Redraw MSet</button>
+    <label for="autodraw">JSet mode: </label>
     <select id="autodraw" name="autodraw">
         <option value="off" selected="selected">Autodraw Julia Set Mode Off</option>
         <option value="on">Autodraw Julia Set Mode On</option>
@@ -57,22 +63,22 @@
     <canvas id="jset_canvas" width="640" height="480"></canvas>
 </p>
 <p>
-    cx: <input type="text" value="" name="cx" id="cx" value="0.0"/>
-    cy: <input type="text" value="" name="cy" id="cy" value="0.0"/>&nbsp;
+    <label for="cx">cx</label>: <input type="text" name="cx" id="cx" value="0.0"/>
+    <label for="cy">cy</label>: <input type="text" name="cy" id="cy" value="0.0"/>&nbsp;
     <button onclick="julia(event,this)">redraw julia set</button>
 </p>
 <p>
-    mset: x_min = <input type="text" value="" name="x_min" id="x_min" />
-    y_min = <input type="text" value="" name="x_min" id="y_min" />
-    x_max = <input type="text" value="" name="x_max" id="x_max" />
-    y_max = <input type="text" value="" name="y_max" id="y_max" />
+    mset: <label for="x_min">x_min</label> = <input type="text" value="" name="x_min" id="x_min"/>
+    <label for="y_min">y_min</label> = <input type="text" value="" name="x_min" id="y_min"/>
+    <label for="x_max">x_max</label> = <input type="text" value="" name="x_max" id="x_max"/>
+    <label for="y_max">y_max</label> = <input type="text" value="" name="y_max" id="y_max"/>
     <button onclick="init();mandelbrot()">Reset</button>
 </p>
 <p>
-    zoom: zoom_x = <input type="text" value="" name="zoom_x" id="zoom_x" />
-    zoom_y = <input type="text" value="" name="zoom_y" id="zoom_y" />
-    zoom_w = <input type="text" value="" name="zoom_w" id="zoom_w" />
-    zoom_h = <input type="text" value="" name="zoom_h" id="zoom_h" />
+    zoom: <label for="zoom_x">zoom_x</label> = <input type="text" value="" name="zoom_x" id="zoom_x"/>
+    <label for="zoom_y">zoom_y</label> = <input type="text" value="" name="zoom_y" id="zoom_y"/>
+    <label for="zoom_w">zoom_w</label> = <input type="text" value="" name="zoom_w" id="zoom_w"/>
+    <label for="zoom_h">zoom_h</label> = <input type="text" value="" name="zoom_h" id="zoom_h"/>
 </p>
 <p>There's also an archive of old Fractal work I did with Dan Grace back in the Eighties on the <a
         href="http://mbharris.co.uk/mandlebrot-set-and-julia-set-generator-for-atari-st/">Fractal Engine archive

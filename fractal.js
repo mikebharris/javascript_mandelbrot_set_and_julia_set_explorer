@@ -91,6 +91,13 @@ function selectMethod() {
         default:
             document.getElementById("palette_chooser").style.display = 'none'
     }
+    switch (method) {
+        case 'dem':
+            document.getElementById("dem-parameters").style.display = 'inline'
+            break
+        default:
+            document.getElementById("dem-parameters").style.display = 'none'
+    }
 }
 
 function getCurrentPlane() {
@@ -187,7 +194,7 @@ function mandelbrotDrawingFuncLsm(ctx, maxIterations, pointColouringFunc, plane)
 
 function mandelbrotDrawingFuncDem(ctx, maxIterations, plane) {
     const scalingFactor = getScalingFactors(plane);
-    const delta = 0.2 * scalingFactor.x
+    const delta = document.getElementById('dem-threshold').value * scalingFactor.x
     const paletteNumber = document.getElementById('palette').value
 
     for (let iy = 0; iy < yResolution; iy++) {
@@ -201,7 +208,7 @@ function mandelbrotDrawingFuncDem(ctx, maxIterations, plane) {
                 ctx.fillStyle = "#000000"
             } else {
                 // ctx.fillStyle = "#ffffff"
-                ctx.fillStyle = colourPalettes[paletteNumber][parseInt(dist*100 % colourPalettes[paletteNumber].length)]
+                ctx.fillStyle = colourPalettes[paletteNumber][parseInt(dist * 100 % colourPalettes[paletteNumber].length)]
             }
             ctx.fillRect(ix, iy, 1, 1)
         }
@@ -225,7 +232,7 @@ function computePointDem(point, cx, cy, maxIterations) {
         xorbit[iterations] = x
         yorbit[iterations] = y
     }
-    const overflow = 100000000000;
+    const overflow = document.getElementById('dem-overflow').value
     if ((x2 + y2) > huge) {
         let xder = 0.0, yder = 0.0
         let i = 0
@@ -287,9 +294,9 @@ function computePoint(point, cx, cy, maxIterations) {
     return iterations;
 }
 
-function setJuliaSetCoordinates(evt, obj) {
-    const x_pos = evt.clientX - obj.offsetLeft;
-    const y_pos = evt.clientY - obj.offsetTop;
+function setJuliaSetCoordinates(evt, canvas) {
+    const x_pos = evt.clientX - canvas.offsetLeft;
+    const y_pos = evt.clientY - canvas.offsetTop;
     const currentPlane = getCurrentPlane();
     const scalingFactors = getScalingFactors(currentPlane);
     const cx = currentPlane.x_min + x_pos * scalingFactors.x;
@@ -349,15 +356,15 @@ function drawJuliaSetForCurrentC(event, obj) {
     julia(event, obj);
 }
 
-function handleMsetMouseMove(event, obj) {
+function handleMsetMouseMove(event, canvas) {
     function moveZoomBox() {
         const {x, y, w, h} = getCurrentZoomWindow()
-        let ctx = document.getElementById("mset_canvas").getContext("2d");
+        let ctx = canvas.getContext("2d");
         if (canvasBeforeZoomBox != null) {
             ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
         }
-        const x_pos = event.clientX - obj.offsetLeft;
-        const y_pos = event.clientY - obj.offsetTop;
+        const x_pos = event.clientX - canvas.offsetLeft;
+        const y_pos = event.clientY - canvas.offsetTop;
         drawZoomBox(ctx, {x: x_pos, y: y_pos, w: w, h: h})
     }
 
@@ -367,14 +374,13 @@ function handleMsetMouseMove(event, obj) {
             break;
         default:
             if (document.getElementById('autodraw').value === 'on') {
-                drawJuliaSetForCurrentC(event, obj);
+                drawJuliaSetForCurrentC(event, canvas);
             }
     }
 }
 
-function handleMsetMouseClick(event, obj) {
-    function zoomIn() {
-        let ctx = document.getElementById("mset_canvas").getContext("2d")
+function handleMsetMouseClick(event, canvas) {
+    function zoomIn(ctx) {
         if (canvasBeforeZoomBox != null) {
             ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
         }
@@ -383,8 +389,7 @@ function handleMsetMouseClick(event, obj) {
         drawZoomBox(ctx, getCurrentZoomWindow())
     }
 
-    function zoomOut() {
-        let ctx = document.getElementById("mset_canvas").getContext("2d")
+    function zoomOut(ctx) {
         if (canvasBeforeZoomBox != null) {
             ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
         }
@@ -395,17 +400,18 @@ function handleMsetMouseClick(event, obj) {
 
     switch (mode) {
         case ZOOM_MODE:
+            let ctx = canvas.getContext("2d")
             switch (event.button) {
                 case 0:
-                    zoomIn()
+                    zoomIn(ctx)
                     break
                 case 2:
-                    zoomOut()
+                    zoomOut(ctx)
                     break
             }
             break
         default:
-            drawJuliaSetForCurrentC(event, obj)
+            drawJuliaSetForCurrentC(event, canvas)
     }
 }
 
