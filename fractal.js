@@ -94,9 +94,11 @@ function selectMethod() {
     switch (method) {
         case 'dem':
             document.getElementById("dem-parameters").style.display = 'inline'
+            document.getElementById("lsm-parameters").style.display = 'none'
             break
         default:
             document.getElementById("dem-parameters").style.display = 'none'
+            document.getElementById("lsm-parameters").style.display = 'inline'
     }
 }
 
@@ -154,9 +156,9 @@ function setColourUsingBinaryDecompositionMethod(iterations, maxIterations, ctx,
         // color it depending on the angle of alpha
         const alpha = Math.atan(point.y);
         if ((alpha >= 0) && (alpha <= 3)) {
-            ctx.fillStyle = "#fff";
-        } else {
             ctx.fillStyle = "#000";
+        } else {
+            ctx.fillStyle = "#fff";
         }
     }
 }
@@ -165,7 +167,7 @@ function setColourUsingLevelSetMethod(iterations, maxIterations, ctx) {
     if (iterations == maxIterations) {
         // if we didn't get to infinity by the time we
         // used up all the iterations, then we're in the set
-        // colour it bloack
+        // colour it black
         ctx.fillStyle = "#000000";
     } else {
         // otherwise colour it according to the number
@@ -278,7 +280,7 @@ function juliaDrawingFuncLsm(ctx, maxIterations, pointColouringFunc, plane) {
 }
 
 function computePoint(point, cx, cy, maxIterations) {
-    const threshold = 10000.00; // threshold above which value is considered to tend to infinity
+    const threshold = document.getElementById("lsm-threshold").value; // threshold above which value is considered to tend to infinity
 
     let x2 = point.x * point.x;
     let y2 = point.y * point.y;

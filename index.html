@@ -41,6 +41,11 @@
                                                                             onchange="mandelbrot(); julia()"/></span>
     <label for="iterations">Iterations</label>:
     <input id="iterations" type="number" min="25" max="5000" value="100" step="25"/>
+    <span id="lsm-parameters">
+                <label for="lsm-threshold">threshold: </label>
+        <input id="lsm-threshold" name="lsm-threshold" value="100.00" type="number" step="100" min="1"
+               max="10000"/>&nbsp;
+    </span>
     <span id="dem-parameters" style="display: none">
         <label for="dem-threshold">threshold: </label>
         <input id="dem-threshold" name="dem-threshold" value="0.2" type="number" step="0.01" min="0" max="3"/>&nbsp;
