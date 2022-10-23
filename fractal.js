@@ -30,14 +30,14 @@ const colourPalettes =
         ['#FFFFFF']
     ]
 
-const xResolution = document.getElementById("mset_canvas").clientWidth;
-const yResolution = document.getElementById("mset_canvas").clientHeight;
+const xResolution = document.getElementById("mset_canvas").clientWidth
+const yResolution = document.getElementById("mset_canvas").clientHeight
 
-const defaultMsetPlane = {x_min: -2.5, y_min: -1.25, x_max: 0.8, y_max: 1.25};
-const defaultJsetPlane = {x_min: -2.0, y_min: -1.5, x_max: 2.0, y_max: 1.5};
+const defaultMsetPlane = {x_min: -2.5, y_min: -1.25, x_max: 0.8, y_max: 1.25}
+const defaultJsetPlane = {x_min: -2.0, y_min: -1.5, x_max: 2.0, y_max: 1.5}
 
-const ZOOM_MODE = 'zoom';
-const EXPLORE_MODE = 'explore';
+const ZOOM_MODE = 'zoom'
+const EXPLORE_MODE = 'explore'
 let mode = EXPLORE_MODE
 
 class CanvasRectangleSnapshot {
@@ -54,7 +54,7 @@ let canvasBeforeZoomBox = null
 
 function init() {
     document.getElementById("palette").setAttribute("max", (colourPalettes.length - 1).toString())
-    setMsetWindowTo(defaultMsetPlane);
+    setMsetWindowTo(defaultMsetPlane)
     setZoomWindowTo(160, 120, 320, 240)
 }
 
@@ -82,7 +82,7 @@ function getCurrentZoomWindow() {
 }
 
 function selectMethod() {
-    const method = document.getElementById('method').value;
+    const method = document.getElementById('method').value
     switch (method) {
         case 'lsm':
         case 'dem':
@@ -108,11 +108,11 @@ function getCurrentPlane() {
         y_min: parseFloat(document.getElementById("y_min").value),
         x_max: parseFloat(document.getElementById("x_max").value),
         y_max: parseFloat(document.getElementById("y_max").value)
-    };
+    }
 }
 
 function mandelbrot() {
-    const canvas = document.getElementById("mset_canvas");
+    const canvas = document.getElementById("mset_canvas")
     const currentPlane = getCurrentPlane()
     switch (document.getElementById('method').value) {
         case 'dem':
@@ -128,10 +128,10 @@ function julia() {
 }
 
 function drawSet(canvas, drawingFunc, plane) {
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d")
     ctx.reset()
-    const max_iters = document.getElementById('iterations').value;
-    const method = document.getElementById('method').value;
+    const max_iters = document.getElementById('iterations').value
+    const method = document.getElementById('method').value
 
     drawingFunc(ctx, max_iters, getColouringFunctionForMethod(method), plane)
 }
@@ -151,14 +151,14 @@ function setColourUsingBinaryDecompositionMethod(iterations, maxIterations, ctx,
         // if we didn't get to infinity by the time we
         // used up all the iterations, then we're in the set
         // colour it black
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = "#000"
     } else {
         // color it depending on the angle of alpha
-        const alpha = Math.atan(point.y);
+        const alpha = Math.atan(point.y)
         if ((alpha >= 0) && (alpha <= 3)) {
-            ctx.fillStyle = "#000";
+            ctx.fillStyle = "#000"
         } else {
-            ctx.fillStyle = "#fff";
+            ctx.fillStyle = "#fff"
         }
     }
 }
@@ -168,48 +168,47 @@ function setColourUsingLevelSetMethod(iterations, maxIterations, ctx) {
         // if we didn't get to infinity by the time we
         // used up all the iterations, then we're in the set
         // colour it black
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = "#000000"
     } else {
         // otherwise colour it according to the number
         // of iterations it took to get to infinity (threshold)
-        const paletteNumber = document.getElementById('palette').value;
-        ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length];
+        const paletteNumber = document.getElementById('palette').value
+        ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length]
     }
 }
 
 function mandelbrotDrawingFuncLsm(ctx, maxIterations, pointColouringFunc, plane) {
-    const scalingFactor = getScalingFactors(plane);
+    const scalingFactor = getScalingFactors(plane)
 
     for (let iy = 0; iy < yResolution; iy++) {
-        const cy = plane.y_min + iy * scalingFactor.y;
+        const cy = plane.y_min + iy * scalingFactor.y
 
         for (let ix = 0; ix < xResolution; ix++) {
-            const cx = plane.x_min + ix * scalingFactor.x;
-            const currentPoint = {x: 0.0, y: 0.0};
-            const iterations = computePoint(currentPoint, cx, cy, maxIterations);
+            const cx = plane.x_min + ix * scalingFactor.x
+            const currentPoint = {x: 0.0, y: 0.0}
+            const iterations = computePoint(currentPoint, cx, cy, maxIterations)
 
-            pointColouringFunc(iterations, maxIterations, ctx, currentPoint);
-            ctx.fillRect(ix, iy, 1, 1);
+            pointColouringFunc(iterations, maxIterations, ctx, currentPoint)
+            ctx.fillRect(ix, iy, 1, 1)
         }
     }
 }
 
 function mandelbrotDrawingFuncDem(ctx, maxIterations, plane) {
-    const scalingFactor = getScalingFactors(plane);
+    const scalingFactor = getScalingFactors(plane)
     const delta = document.getElementById('dem-threshold').value * scalingFactor.x
     const paletteNumber = document.getElementById('palette').value
 
     for (let iy = 0; iy < yResolution; iy++) {
-        const cy = plane.y_min + iy * scalingFactor.y;
+        const cy = plane.y_min + iy * scalingFactor.y
 
         for (let ix = 0; ix < xResolution; ix++) {
-            const cx = plane.x_min + ix * scalingFactor.x;
-            const currentPoint = {x: 0.0, y: 0.0};
-            const dist = computePointDem(currentPoint, cx, cy, maxIterations);
+            const cx = plane.x_min + ix * scalingFactor.x
+            const currentPoint = {x: 0.0, y: 0.0}
+            const dist = computePointDem(currentPoint, cx, cy, maxIterations)
             if (dist < delta) {
                 ctx.fillStyle = "#000000"
             } else {
-                // ctx.fillStyle = "#ffffff"
                 ctx.fillStyle = colourPalettes[paletteNumber][parseInt(dist * 100 % colourPalettes[paletteNumber].length)]
             }
             ctx.fillRect(ix, iy, 1, 1)
@@ -218,19 +217,19 @@ function mandelbrotDrawingFuncDem(ctx, maxIterations, plane) {
 }
 
 function computePointDem(point, cx, cy, maxIterations) {
-    const huge = 100000.0;
+    const huge = 100000.0
     let x = point.x, y = point.y, x2 = 0.0, y2 = 0.0, dist = 0.0, xorbit = [], yorbit = []
     xorbit[0] = 0.0
     yorbit[0] = 0.0
 
-    let iterations = 0;
+    let iterations = 0
     while ((iterations < maxIterations) && ((x2 + y2) < huge)) {
         let temp = x2 - y2 + cx
         y = 2 * x * y + cy
         x = temp
         x2 = x * x
         y2 = y * y
-        iterations++;
+        iterations++
         xorbit[iterations] = x
         yorbit[iterations] = y
     }
@@ -261,69 +260,69 @@ function getScalingFactors(plane) {
 }
 
 function juliaDrawingFuncLsm(ctx, maxIterations, pointColouringFunc, plane) {
-    const scalingFactor = getScalingFactors(plane);
+    const scalingFactor = getScalingFactors(plane)
 
-    const cx = Number(document.getElementById('cx').value);
-    const cy = Number(document.getElementById('cy').value);
+    const cx = Number(document.getElementById('cx').value)
+    const cy = Number(document.getElementById('cy').value)
 
     for (let iy = 0; iy < yResolution; iy++) {
-        const y = plane.y_min + iy * scalingFactor.y;
+        const y = plane.y_min + iy * scalingFactor.y
 
         for (let ix = 0; ix < xResolution; ix++) {
-            const currentPoint = {x: plane.x_min + ix * scalingFactor.x, y: y};
-            const iterations = computePoint(currentPoint, cx, cy, maxIterations);
+            const currentPoint = {x: plane.x_min + ix * scalingFactor.x, y: y}
+            const iterations = computePoint(currentPoint, cx, cy, maxIterations)
 
             pointColouringFunc(iterations, maxIterations, ctx, currentPoint)
-            ctx.fillRect(ix, iy, 1, 1);
+            ctx.fillRect(ix, iy, 1, 1)
         }
     }
 }
 
 function computePoint(point, cx, cy, maxIterations) {
-    const threshold = document.getElementById("lsm-threshold").value; // threshold above which value is considered to tend to infinity
+    const threshold = document.getElementById("lsm-threshold").value
 
-    let x2 = point.x * point.x;
-    let y2 = point.y * point.y;
-    let iterations = 0;
+    let x2 = point.x * point.x
+    let y2 = point.y * point.y
+    let iterations = 0
     while ((iterations < maxIterations) && ((x2 + y2) < threshold)) {
-        let temp = x2 - y2 + cx;
-        point.y = 2 * point.x * point.y + cy;
-        point.x = temp;
-        x2 = point.x * point.x;
-        y2 = point.y * point.y;
-        iterations++;
+        let temp = x2 - y2 + cx
+        point.y = 2 * point.x * point.y + cy
+        point.x = temp
+        x2 = point.x * point.x
+        y2 = point.y * point.y
+        iterations++
     }
-    return iterations;
+    return iterations
 }
 
 function getMousePos(evt, canvas) {
-    const rect = canvas.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect()
     return {
         x: evt.clientX - rect.left,
         y: evt.clientY - rect.top
-    };
+    }
 }
 
 function setJuliaSetCoordinates(evt, canvas) {
     const pos = getMousePos(evt, canvas)
-    const currentPlane = getCurrentPlane();
-    const scalingFactors = getScalingFactors(currentPlane);
-    const cx = currentPlane.x_min + pos.x * scalingFactors.x;
-    const cy = currentPlane.y_min + pos.y * scalingFactors.y;
-    document.getElementById('cx').value = cx;
-    document.getElementById('cy').value = cy;
+    const currentPlane = getCurrentPlane()
+    const scalingFactors = getScalingFactors(currentPlane)
+    const cx = currentPlane.x_min + pos.x * scalingFactors.x
+    const cy = currentPlane.y_min + pos.y * scalingFactors.y
+    document.getElementById('cx').value = cx
+    document.getElementById('cy').value = cy
 }
 
 function zoomToNewWindow(ctx, canvas) {
-    const {x, y, w, h} = getCurrentZoomWindow();
-    const currentPlane = getCurrentPlane();
-    const scalingFactors = getScalingFactors(currentPlane);
+    const {x, y, w, h} = getCurrentZoomWindow()
+    const currentPlane = getCurrentPlane()
+    const scalingFactors = getScalingFactors(currentPlane)
     const zoomedPlane = {
         x_min: currentPlane.x_min + x * scalingFactors.x,
         y_min: currentPlane.y_min + y * scalingFactors.y,
         x_max: currentPlane.x_min + (x + w) * scalingFactors.x,
         y_max: currentPlane.y_min + (y + h) * scalingFactors.y
-    };
+    }
 
     setMsetWindowTo(zoomedPlane)
     ctx.reset()
@@ -332,12 +331,12 @@ function zoomToNewWindow(ctx, canvas) {
 }
 
 function keyCommandProcessor(e) {
-    const eventObject = window.event ? event : e; //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
-    const keyCode = eventObject.charCode ? eventObject.charCode : eventObject.keyCode;
-    const Z_KEY_CODE = 90;
-    const ENTER_KEY_CODE = 13;
-    let canvas = document.getElementById("mset_canvas");
-    let ctx = canvas.getContext("2d");
+    const eventObject = window.event ? event : e //distinguish between IE's explicit event object (window.event) and Firefox's implicit.
+    const keyCode = eventObject.charCode ? eventObject.charCode : eventObject.keyCode
+    const Z_KEY_CODE = 90
+    const ENTER_KEY_CODE = 13
+    let canvas = document.getElementById("mset_canvas")
+    let ctx = canvas.getContext("2d")
     switch (keyCode) {
         case Z_KEY_CODE:
             if (mode !== ZOOM_MODE) {
@@ -348,12 +347,12 @@ function keyCommandProcessor(e) {
                 mandelbrot()
                 mode = EXPLORE_MODE
             }
-            break;
+            break
         case ENTER_KEY_CODE:
             if (mode === ZOOM_MODE) {
                 zoomToNewWindow(ctx, canvas)
             }
-            break;
+            break
         default:
             console.log("key code is " + keyCode)
     }
@@ -367,22 +366,22 @@ function drawJuliaSetForCurrentC(event, canvas) {
 function handleMsetMouseMove(event, canvas) {
     function moveZoomBox() {
         const {x, y, w, h} = getCurrentZoomWindow()
-        let ctx = canvas.getContext("2d");
+        let ctx = canvas.getContext("2d")
         if (canvasBeforeZoomBox != null) {
             ctx.putImageData(canvasBeforeZoomBox.imageData, canvasBeforeZoomBox.x, canvasBeforeZoomBox.y)
         }
-        const x_pos = event.clientX - canvas.offsetLeft;
-        const y_pos = event.clientY - canvas.offsetTop;
+        const x_pos = event.clientX - canvas.offsetLeft
+        const y_pos = event.clientY - canvas.offsetTop
         drawZoomBox(ctx, {x: x_pos, y: y_pos, w: w, h: h})
     }
 
     switch (mode) {
         case ZOOM_MODE:
             moveZoomBox()
-            break;
+            break
         default:
             if (document.getElementById('autodraw').value === 'on') {
-                drawJuliaSetForCurrentC(event, canvas);
+                drawJuliaSetForCurrentC(event, canvas)
             }
     }
 }
