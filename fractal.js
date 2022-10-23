@@ -1,7 +1,7 @@
 //
 // JavaScript methods to draw Mandelbrot and Julia Sets
 //
-// version 1.5 - featuring LSM, DEM and BDM methods, iterations slider, colour palettes, auto draw julia set mode, and zoom mode
+// version 1.5 - featuring LSM, DEM, BDM, TDM and BDM2 methods, iterations slider, colour palettes, auto draw julia set mode, and zoom mode
 //
 // (c) 2009-2022 Mike Harris; (c) 1987-1990 Mike Harris & Dan Grace
 // Free software released under GNU Public Licence v2.0.
@@ -86,6 +86,8 @@ function selectMethod() {
     switch (method) {
         case 'lsm':
         case 'dem':
+        case 'tdm':
+        case 'bdm2':
             document.getElementById("palette_chooser").style.display = 'inline'
             break
         default:
@@ -140,6 +142,10 @@ function getColouringFunctionForMethod(method) {
     switch (method) {
         case 'bdm':
             return setColourUsingBinaryDecompositionMethod
+        case 'bdm2':
+            return setColourUsingBinaryDecompositionMethod2
+        case 'tdm':
+            return setColourUsingTrinaryDecompositionMethod
         case 'lsm':
         default:
             return setColourUsingLevelSetMethod
@@ -160,6 +166,43 @@ function setColourUsingBinaryDecompositionMethod(iterations, maxIterations, ctx,
             ctx.fillStyle = "#000"
         } else {
             ctx.fillStyle = "#fff"
+        }
+    }
+}
+
+function setColourUsingTrinaryDecompositionMethod(iterations, maxIterations, ctx, point) {
+    if (iterations == maxIterations) {
+        // if we didn't get to infinity by the time we
+        // used up all the iterations, then we're in the set
+        // colour it black
+        ctx.fillStyle = "#000"
+    } else {
+        // color it depending on the angle of alpha
+        const alpha = Math.atan2(point.y, point.x) * 180 / Math.PI
+        const paletteNumber = document.getElementById('palette').value
+        if ((alpha > 0) && (alpha <= 90)) {
+            ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length % 3]
+        } else if ((alpha >= 90) && (alpha < 180)) {
+            ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length % 2]
+        } else {
+            ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length]
+        }
+    }
+}
+
+function setColourUsingBinaryDecompositionMethod2(iterations, maxIterations, ctx, point) {
+    if (iterations == maxIterations) {
+        // if we didn't get to infinity by the time we
+        // used up all the iterations, then we're in the set
+        // colour it black
+        ctx.fillStyle = "#000"
+    } else {
+        const alpha = Math.atan(Math.abs(point.y))
+        const paletteNumber = document.getElementById('palette').value
+        if ((alpha > 0) && (alpha <= 1.5)) {
+            ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length % 2]
+        } else {
+            ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length]
         }
     }
 }
