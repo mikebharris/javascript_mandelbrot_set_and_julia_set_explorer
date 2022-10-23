@@ -36,6 +36,8 @@ const yResolution = document.getElementById("mset_canvas").clientHeight
 const defaultMsetPlane = {x_min: -2.5, y_min: -1.25, x_max: 0.8, y_max: 1.25}
 const defaultJsetPlane = {x_min: -2.0, y_min: -1.5, x_max: 2.0, y_max: 1.5}
 
+let paletteNumber = 0
+
 const ZOOM_MODE = 'zoom'
 const EXPLORE_MODE = 'explore'
 let mode = EXPLORE_MODE
@@ -116,6 +118,7 @@ function getCurrentPlane() {
 function mandelbrot() {
     const canvas = document.getElementById("mset_canvas")
     const currentPlane = getCurrentPlane()
+    paletteNumber = document.getElementById('palette').value
     switch (document.getElementById('method').value) {
         case 'dem':
             mandelbrotDrawingFuncDem(canvas.getContext("2d"), document.getElementById('iterations').value, currentPlane)
@@ -126,6 +129,7 @@ function mandelbrot() {
 }
 
 function julia() {
+    paletteNumber = document.getElementById('palette').value
     drawSet(document.getElementById("jset_canvas"), juliaDrawingFuncLsm, defaultJsetPlane)
 }
 
@@ -153,14 +157,10 @@ function getColouringFunctionForMethod(method) {
 }
 
 function setColourUsingBinaryDecompositionMethod(iterations, maxIterations, ctx, point) {
-    if (iterations == maxIterations) {
-        // if we didn't get to infinity by the time we
-        // used up all the iterations, then we're in the set
-        // colour it black
+    if (iterations == maxIterations) { // we are in the set
         ctx.fillStyle = "#000"
     } else {
         // color it depending on the angle of alpha
-        // const alpha = Math.atan(Math.abs(point.y)) <- interesting with upper bound around 0.8
         const alpha = Math.atan2(point.y, point.x)
         if ((alpha >= 0) && (alpha < 2 * Math.PI)) {
             ctx.fillStyle = "#000"
@@ -171,15 +171,11 @@ function setColourUsingBinaryDecompositionMethod(iterations, maxIterations, ctx,
 }
 
 function setColourUsingTrinaryDecompositionMethod(iterations, maxIterations, ctx, point) {
-    if (iterations == maxIterations) {
-        // if we didn't get to infinity by the time we
-        // used up all the iterations, then we're in the set
-        // colour it black
+    if (iterations == maxIterations) { // we are in the set
         ctx.fillStyle = "#000"
     } else {
         // color it depending on the angle of alpha
         const alpha = Math.atan2(point.y, point.x) * 180 / Math.PI
-        const paletteNumber = document.getElementById('palette').value
         if ((alpha > 0) && (alpha <= 90)) {
             ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length % 3]
         } else if ((alpha >= 90) && (alpha < 180)) {
@@ -191,14 +187,10 @@ function setColourUsingTrinaryDecompositionMethod(iterations, maxIterations, ctx
 }
 
 function setColourUsingBinaryDecompositionMethod2(iterations, maxIterations, ctx, point) {
-    if (iterations == maxIterations) {
-        // if we didn't get to infinity by the time we
-        // used up all the iterations, then we're in the set
-        // colour it black
+    if (iterations == maxIterations) { // we are in the set
         ctx.fillStyle = "#000"
     } else {
         const alpha = Math.atan(Math.abs(point.y))
-        const paletteNumber = document.getElementById('palette').value
         if ((alpha > 0) && (alpha <= 1.5)) {
             ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length % 2]
         } else {
@@ -208,15 +200,10 @@ function setColourUsingBinaryDecompositionMethod2(iterations, maxIterations, ctx
 }
 
 function setColourUsingLevelSetMethod(iterations, maxIterations, ctx) {
-    if (iterations == maxIterations) {
-        // if we didn't get to infinity by the time we
-        // used up all the iterations, then we're in the set
-        // colour it black
-        ctx.fillStyle = "#000000"
+    if (iterations == maxIterations) { // we are in the set
+        ctx.fillStyle = "#000"
     } else {
-        // otherwise colour it according to the number
-        // of iterations it took to get to infinity (threshold)
-        const paletteNumber = document.getElementById('palette').value
+        // colour it according to the number of iterations it took to get to infinity
         ctx.fillStyle = colourPalettes[paletteNumber][iterations % colourPalettes[paletteNumber].length]
     }
 }
@@ -241,7 +228,6 @@ function mandelbrotDrawingFuncLsm(ctx, maxIterations, pointColouringFunc, plane)
 function mandelbrotDrawingFuncDem(ctx, maxIterations, plane) {
     const scalingFactor = getScalingFactors(plane)
     const delta = document.getElementById('dem-threshold').value * scalingFactor.x
-    const paletteNumber = document.getElementById('palette').value
 
     for (let iy = 0; iy < yResolution; iy++) {
         const cy = plane.y_min + iy * scalingFactor.y
