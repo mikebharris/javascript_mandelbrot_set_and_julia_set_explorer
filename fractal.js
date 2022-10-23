@@ -357,9 +357,9 @@ function keyCommandProcessor(e) {
     }
 }
 
-function drawJuliaSetForCurrentC(event, obj) {
-    setJuliaSetCoordinates(event, obj);
-    julia(event, obj);
+function drawJuliaSetForCurrentC(event, canvas) {
+    setJuliaSetCoordinates(event, canvas)
+    julia()
 }
 
 function handleMsetMouseMove(event, canvas) {
