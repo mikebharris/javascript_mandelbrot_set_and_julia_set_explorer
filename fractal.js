@@ -294,14 +294,20 @@ function computePoint(point, cx, cy, maxIterations) {
     return iterations;
 }
 
+function getMousePos(evt, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+    };
+}
+
 function setJuliaSetCoordinates(evt, canvas) {
-    const x_pos = evt.clientX - canvas.offsetLeft;
-    const y_pos = evt.clientY - canvas.offsetTop;
+    const pos = getMousePos(evt, canvas)
     const currentPlane = getCurrentPlane();
     const scalingFactors = getScalingFactors(currentPlane);
-    const cx = currentPlane.x_min + x_pos * scalingFactors.x;
-    const cy = currentPlane.y_min + y_pos * scalingFactors.y;
-
+    const cx = currentPlane.x_min + pos.x * scalingFactors.x;
+    const cy = currentPlane.y_min + pos.y * scalingFactors.y;
     document.getElementById('cx').value = cx;
     document.getElementById('cy').value = cy;
 }
