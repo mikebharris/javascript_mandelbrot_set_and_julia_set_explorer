@@ -365,6 +365,7 @@ function keyCommandProcessor(e) {
     const keyCode = eventObject.charCode ? eventObject.charCode : eventObject.keyCode
     const Z_KEY_CODE = 90
     const ENTER_KEY_CODE = 13
+    const A_KEY_CODE = 65
     let canvas = document.getElementById("mset_canvas")
     let ctx = canvas.getContext("2d")
     switch (keyCode) {
@@ -381,6 +382,14 @@ function keyCommandProcessor(e) {
         case ENTER_KEY_CODE:
             if (mode === ZOOM_MODE) {
                 zoomToNewWindow(ctx, canvas)
+            }
+            break
+        case A_KEY_CODE:
+            const autodraw = document.getElementById("autodraw");
+            if (autodraw.value == 'off') {
+                autodraw.value = 'on'
+            } else {
+                autodraw.value = 'off'
             }
             break
         default:
